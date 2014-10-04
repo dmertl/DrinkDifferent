@@ -8,6 +8,7 @@ TODO
 
 - Combine separate ball and chain and stout beer notifier into single package
 - Standardize scraping
+ - Separate menu diff from scraping. Scraping should simply generate beverage data. Menu diff can run afterwards.
 - Get ball and chain into scraper
 - Get ball and chain into menu diff
 
@@ -19,6 +20,10 @@ Scrapers
 - Separate scraper per bar.
 - Returns a list of standardized Beverage objects.
 - Beverage objects can be easily converted to JSON for storage or parsing.
+
+### Ideas
+
+- Ignore wine
 
 Menu Diff
 ---------
