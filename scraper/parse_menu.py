@@ -12,11 +12,16 @@ from unidecode import unidecode
 
 import sys
 from scraper.model import MenuScrape, Location, Beverage
-from scraper.util import scrape_to_dict
+from scraper.util import url_from_arg, flatten_beverages
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
 
+locations = [
+    Location('Hollywood', 'http://www.stoutburgersandbeers.com/hollywood-beer-menu/', 'Stout'),
+    Location('Studio City', 'http://www.stoutburgersandbeers.com/studio-city-beer-menu/', 'Stout'),
+    Location('Santa Monica', 'http://www.stoutburgersandbeers.com/santa-monica-beer-menu/', 'Stout'),
+]
 
 class ParsingException(Exception):
     pass
@@ -211,13 +216,7 @@ class BeerParser(BeverageParser):
 
 
 def parse_menu(html, location, date):
-    # TODO: get actual URL
-    url = ''
-    # TODO: pass in actual location
-    loc = Location(location, url, 'Stout')
-    menu_scrape = MenuScrape(loc, url, date)
-    menu_scrape.beverages = parse_sections(html)
-    return menu_scrape
+    return parse_sections(html)
 
 
 def parse_sections(html):
@@ -369,19 +368,15 @@ if __name__ == '__main__':
     parser.add_argument('--pretty', action='store_true', help='pretty print JSON output')
     args = parser.parse_args()
 
-    # Parse menu file
-    filename = args.filename
-    if os.path.exists(filename):
-        contents = urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath(filename)))).read()
-    else:
-        contents = urllib2.urlopen(filename).read()
+    # Run scraper
+    url = url_from_arg(args.filename, locations)
+    # TODO: handle read failure
+    contents = urllib2.urlopen(url).read()
+    beverages = parse_menu(contents, 'Studio City', datetime.now())
+    beverages_flat = flatten_beverages(beverages)
 
-    if contents:
-        menu_scrape = parse_menu(contents, 'Studio City', datetime.now())
-        menu_dict = scrape_to_dict(menu_scrape)
-        if args.pretty:
-            print json.dumps(menu_dict, indent=2)
-        else:
-            print json.dumps(menu_dict)
+    # Output beverage data as JSON
+    if args.pretty:
+        print json.dumps(beverages_flat, indent=2)
     else:
-        print 'Unable to read menu from "{0}".'.format(filename)
+        print json.dumps(beverages_flat)

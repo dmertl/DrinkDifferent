@@ -1,6 +1,7 @@
 import os
 import urllib2
 
+#TOOD: remove
 def scrape_to_dict(menu_scrape):
     """
     Convert a MenuScrape to dict that can be easily dumped to JSON.
