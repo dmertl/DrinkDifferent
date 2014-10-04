@@ -41,3 +41,15 @@ class Location(object):
         self.url = None
         # Chain name
         self.chain = None
+
+
+class MenuScrape(object):
+    def __init__(self, location=None, url=None, beverages=None, date=None):
+        # Location scraped
+        self.location = location
+        # URL scraped
+        self.url = url
+        # Beverages found
+        self.beverages = beverages
+        # Date of scraping
+        self.date = date
