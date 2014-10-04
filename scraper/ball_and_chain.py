@@ -11,6 +11,11 @@ from scraper.util import flatten_beverages
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
 
+# Ball and Chain locations
+locations = [
+    Location('Hollywood', 'http://www.ball-and-chain-restaurant.com/', 'Ball and Chain')
+]
+
 
 class Scraper(object):
     def __init__(self):
@@ -119,9 +124,6 @@ if __name__ == '__main__':
         sh.setLevel(logging.INFO)
     sh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
     root_log.addHandler(sh)
-
-    # Ball and Chain locations
-    locations = [Location('Hollywood', 'http://www.ball-and-chain-restaurant.com/', 'Ball and Chain')]
 
     # Run scraper
     scraper = Scraper()
