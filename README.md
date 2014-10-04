@@ -25,6 +25,9 @@ Scrapers
 
 - Ignore wine
 - Prioritize scraping name + brewery, everything else is irrelevant
+- All scrapes should be executable scripts and python modules
+- Executing from command line should allow for scraping file or url and output JSON
+- Would be nice if scrapers simply took HTML. So far both stout and ball and chain don't need any special handling.
 
 Menu Diff
 ---------
