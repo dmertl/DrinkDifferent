@@ -34,6 +34,12 @@ class Beverage(object):
         # Untappd brewery ID
         self.untappd_brewery_id = None
 
+    def __eq__(self, other):
+        if self.untappd_id and other.untappd_id:
+            return self.untappd_id == other.untappd_id
+        else:
+            return self.name == other.name
+
 
 class Location(object):
     def __init__(self, name=None, url=None, chain=None):
