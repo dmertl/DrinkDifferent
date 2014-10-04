@@ -1,0 +1,43 @@
+{% set locations = ['Hollywood', 'Studio City', 'Santa Monica'] %}
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Stout beer notifier - Diff</title>
+</head>
+<body>
+<form method="get">
+    <label for="diff-location">Location</label>
+    <select name="location" id="diff-location">
+        {% for loc in locations %}
+            {% set selected = "selected" if loc == location else ""  %}
+            <option value="{{ loc }}" {{ selected }}>{{ loc }}</option>
+        {% endfor %}
+    </select>
+    <label for="diff-start">Start</label>
+    <input type="date" name="start" id="diff-start" value="{{ start }}" />
+    <label for="diff-end">End</label>
+    <input type="date" name="end" id="diff-end" value="{{ end }}"/>
+    <button type="submit">Submit</button>
+</form>
+{% if diff %}
+    {% set diff_old_date = diff['old_date'].strftime('%Y-%m-%d') %}
+    {% set diff_new_date = diff['new_date'].strftime('%Y-%m-%d') %}
+    {% if diff_old_date != start or diff_new_date != end %}
+        Unable to find exact match, display changes from {{ diff_old_date }} to {{ diff_new_date }}.
+    {% endif %}
+    <h2>Added</h2>
+    <ul>
+        {% for add in diff['added'] %}
+            <li>{{ add['beverage'] }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Removed</h2>
+    <ul>
+        {% for removed in diff['remove'] %}
+            <li>{{ removed['beverage'] }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</body>
+</html>
