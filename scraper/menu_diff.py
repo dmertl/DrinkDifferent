@@ -68,7 +68,7 @@ if __name__ == '__main__':
     root_log.addHandler(sh)
 
     # Command line arguments
-    parser = argparse.ArgumentParser(description='Create a diff from two menu parsed by parse_menu.py.')
+    parser = argparse.ArgumentParser(description='Create a diff from two menu parsed by stout.py.')
     parser.add_argument('original', type=str, help='file path to original menu')
     parser.add_argument('modified', type=str, help='file path to modified menu')
     parser.add_argument('--pretty', action='store_true', help='pretty print JSON output')
