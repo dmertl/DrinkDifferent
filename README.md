@@ -6,11 +6,7 @@ Find new beers to drink.
 TODO
 ----
 
-- Update menu diff to handle new scraping output format.
-- Separate menu diff from scraping. Scraping should simply generate beverage data. Menu diff can run afterwards.
-- Get ball and chain into menu diff
 - Create a script to rename existing cache files into new format (menu_2014-08-26_santa_monica to 2014-08-26_stout_santa-monica)
-- Move caching into its own module
 
 Scrapers
 --------
