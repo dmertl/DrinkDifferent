@@ -30,7 +30,7 @@ def scrape_location(location, scraper):
     :return:
     :rtype:
     """
-    _log('Scraping {0} - {1}'.format(location.name, location.url), logging.INFO)
+    _log('Scraping {} {} - {}'.format(location.chain, location.name, location.url), logging.INFO)
     menu_scrape = MenuScrape(location, location.url, datetime.now())
     menu_html = urllib2.urlopen(location.url).read()
     if menu_html:
@@ -51,7 +51,7 @@ def cache_menu(menu_scrape):
     :rtype: str
     """
     # Name files menu_YYYY-MM-DD_location.json
-    file_path = _build_cache_path(menu_scrape.location.name, time=menu_scrape.date)
+    file_path = _build_cache_path(menu_scrape.location.chain, menu_scrape.location.name, time=menu_scrape.date)
     # Organize cache into directories by location/year/month
     directory = os.path.dirname(file_path)
     if not os.path.exists(directory):
@@ -62,8 +62,21 @@ def cache_menu(menu_scrape):
     return file_path
 
 
-def get_cache_near(location, time, lean='new'):
-    cache_path = _build_cache_path(location, time=time)
+def get_cache_near(chain, location, time, lean='new'):
+    """
+
+    :param chain:
+    :type chain: str
+    :param location:
+    :type location: str
+    :param time:
+    :type time: datetime
+    :param lean:
+    :type lean: str
+    :return:
+    :rtype: dict
+    """
+    cache_path = _build_cache_path(chain, location, time=time)
     i = 0
     while not os.path.exists(cache_path):
         i += 1
@@ -71,20 +84,32 @@ def get_cache_near(location, time, lean='new'):
             time = time + timedelta(days=1)
         else:
             time = time - timedelta(days=1)
-        cache_path = _build_cache_path(location, time=time)
+        cache_path = _build_cache_path(chain, location, time=time)
         if i > 100:
             # Unable to find nearby cache, return oldest/newest
-            return get_cache_extreme(location, lean)
+            return get_cache_extreme(chain, location, lean)
     return json.load(open(cache_path))
 
 
-def get_cache_extreme(location, extreme='new'):
-    location = _safe_location(location)
+def get_cache_extreme(chain, location, extreme='new'):
+    """
+
+    :param chain:
+    :type chain: str
+    :param location:
+    :type location: str
+    :param extreme:
+    :type extreme: str
+    :return:
+    :rtype: dict
+    """
+    chain = _safe_name(chain)
+    location = _safe_name(location)
     year = min(os.listdir(cache_root))
     year_dir = os.path.join(cache_root, year)
     month = min(os.listdir(year_dir))
     month_dir = os.path.join(year_dir, month)
-    regex = re.compile('.*[0-9]{4}-[0-9]{2}-([0-9]{2})_' + location + '.json')
+    regex = re.compile('.*[0-9]{4}-[0-9]{2}-([0-9]{2})_' + chain + '_' + location + '.json')
     days = []
     for menu_file in os.listdir(month_dir):
         matches = regex.match(menu_file)
@@ -94,37 +119,75 @@ def get_cache_extreme(location, extreme='new'):
         day = max(days)
     else:
         day = min(days)
-    return get_cache(location=location, year=year, month=month, day=day)
+    return get_cache(chain=chain, location=location, year=year, month=month, day=day)
 
 
-def get_cache(name=None, location=None, time=None, year=None, month=None, day=None):
+def get_cache(name=None, chain=None, location=None, time=None, year=None, month=None, day=None):
+    """
+    TODO: Update to return MenuScrape instead of dict
+
+    :param name:
+    :type name: str
+    :param chain:
+    :type chain: str
+    :param location:
+    :type location: str
+    :param time:
+    :type time: datetime
+    :param year:
+    :type year: str
+    :param month:
+    :type month: str
+    :param day:
+    :type day: str
+    :return:
+    :rtype: dict
+    """
     if name:
-        regex = re.compile('.*([0-9]{4})-([0-9]{2})-([0-9]{2})_(.*)')
+        regex = re.compile('.*([0-9]{4})-([0-9]{2})-([0-9]{2})_([^_]*)_([^_]*)')
         matches = regex.match(name)
-        cache_path = _build_cache_path(matches.group(4), year=matches.group(1), month=matches.group(2),
+        cache_path = _build_cache_path(matches.group(4), matches.group(5), year=matches.group(1), month=matches.group(2),
                                        day=matches.group(3))
     else:
         if time:
-            cache_path = _build_cache_path(location=location, time=time)
+            cache_path = _build_cache_path(chain=chain, location=location, time=time)
         else:
-            cache_path = _build_cache_path(location=location, year=year, month=month, day=day)
+            cache_path = _build_cache_path(chain=chain, location=location, year=year, month=month, day=day)
 
     return json.load(open(cache_path))
 
 
-def _build_cache_path(location, year=None, month=None, day=None, time=None):
-    location = _safe_location(location)
+def _build_cache_path(chain, location, year=None, month=None, day=None, time=None):
+    """
+
+    :param chain:
+    :type chain: str
+    :param location:
+    :type location: str
+    :param year:
+    :type year: str
+    :param month:
+    :type month: str
+    :param day:
+    :type day: str
+    :param time:
+    :type time: datetime
+    :return:
+    :rtype: str
+    """
+    chain = _safe_name(chain)
+    location = _safe_name(location)
     if time:
         _dir = os.path.join(time.strftime('%Y'), time.strftime('%m'))
-        filename = 'menu_{0}_{1}.json'.format(time.strftime('%Y-%m-%d'), location)
+        filename = '{}_{}_{}.json'.format(time.strftime('%Y-%m-%d'), chain, location)
     else:
         _dir = os.path.join(year, month)
-        filename = 'menu_{0}-{1}-{2}_{3}.json'.format(year, month, day, location)
+        filename = '{}-{}-{}_{}_{}.json'.format(year, month, day, chain, location)
     return os.path.join(cache_root, _dir, filename)
 
 
-def _safe_location(location):
-    return location.replace(' ', '_').lower()
+def _safe_name(location):
+    return location.replace(' ', '-').lower()
 
 
 def _log(message, level=logging.INFO):
