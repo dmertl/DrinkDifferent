@@ -6,7 +6,7 @@ import urllib2
 import json
 from bs4 import BeautifulSoup
 from model import Beverage, Location
-from scraper.util import flatten_beverages
+from scraper.util import flatten_beverages, url_from_arg
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
@@ -127,17 +127,8 @@ if __name__ == '__main__':
 
     # Run scraper
     scraper = Scraper()
-
-    if [x for x in locations if x.name == args.url]:
-        location = [x for x in locations if x.name == args.url]
-    else:
-        if os.path.exists(args.url):
-            location = Location(url='file:{0}'.format(urllib2.quote(os.path.abspath(args.url))))
-        else:
-            location = Location(url=args.url)
-
-    contents = urllib2.urlopen(location.url).read()
-
+    url = url_from_arg(args.url, locations)
+    contents = urllib2.urlopen(url).read()
     beverages = scraper.scrape(contents)
     beverages_flat = flatten_beverages(beverages)
 
