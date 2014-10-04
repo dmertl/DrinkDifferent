@@ -5,9 +5,8 @@ import sys
 import urllib2
 import json
 from bs4 import BeautifulSoup
-from model import Beverage, MenuScrape, Location
-from datetime import datetime
-from scraper.util import scrape_to_dict
+from model import Beverage, Location
+from scraper.util import flatten_beverages
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
@@ -17,32 +16,14 @@ class Scraper(object):
     def __init__(self):
         pass
 
-    def scrape(self, url):
+    def scrape(self, html):
         """
 
-        :param url:
-        :type url:
+        :param html:
+        :type html:
         :return:
-        :rtype: MenuScrape
+        :rtype: Beverage[]
         """
-        # TODO: real location
-        location = Location('Hollywood', None, 'Ball and Chain')
-        menu_scrape = MenuScrape(location, url, datetime.now())
-        if os.path.exists(url):
-            menu_scrape.beverages = self.scrape_file(url)
-        else:
-            menu_scrape.beverages = self.scrape_url(url)
-        return menu_scrape
-
-    def scrape_file(self, file):
-        contents = urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath(file)))).read()
-        return self.scrape_html(contents)
-
-    def scrape_url(self, url):
-        contents = urllib2.urlopen(url).read()
-        return self.scrape_html(contents)
-
-    def scrape_html(self, html):
         beverages = []
         # Do a little cleanup to help BeautifulSoup parse correctly
         html = html.replace('</br />', '<br />')
@@ -139,13 +120,27 @@ if __name__ == '__main__':
     sh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
     root_log.addHandler(sh)
 
+    # Ball and Chain locations
+    locations = [Location('Hollywood', 'http://www.ball-and-chain-restaurant.com/', 'Ball and Chain')]
+
     # Run scraper
     scraper = Scraper()
-    menu_scrape = scraper.scrape(args.url)
-    menu_dict = scrape_to_dict(menu_scrape)
+
+    if [x for x in locations if x.name == args.url]:
+        location = [x for x in locations if x.name == args.url]
+    else:
+        if os.path.exists(args.url):
+            location = Location(url='file:{0}'.format(urllib2.quote(os.path.abspath(args.url))))
+        else:
+            location = Location(url=args.url)
+
+    contents = urllib2.urlopen(location.url).read()
+
+    beverages = scraper.scrape(contents)
+    beverages_flat = flatten_beverages(beverages)
 
     # Output beverage data as JSON
     if args.pretty:
-        print json.dumps(menu_dict, indent=2)
+        print json.dumps(beverages_flat, indent=2)
     else:
-        print json.dumps(menu_dict)
+        print json.dumps(beverages_flat)
