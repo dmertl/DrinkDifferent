@@ -6,6 +6,7 @@ setup(name='StoutBeerNotifier',
       install_requires=[
           'lxml',
           'unidecode',
-          'Flask'
+          'Flask',
+          'beautifulsoup4'
       ],
 )
