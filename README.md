@@ -24,6 +24,7 @@ Scrapers
 ### Ideas
 
 - Ignore wine
+- Prioritize scraping name + brewery, everything else is irrelevant
 
 Menu Diff
 ---------

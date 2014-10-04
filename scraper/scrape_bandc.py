@@ -5,6 +5,7 @@ import sys
 import urllib2
 import json
 from bs4 import BeautifulSoup
+from model import Beverage
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
@@ -103,28 +104,6 @@ class Scraper(object):
                         root_log.warn('Unable to parse name and cost from bottled beverage. string={0}'.format(bev))
 
         return beverages
-
-
-class Beverage(object):
-    def __init__(self):
-        # Beverage name
-        self.name = None
-        # Brewery/Winery name
-        self.company = None
-        # Beer or Wine
-        self.type = None
-        # Beer style, IPA, Lager, etc.
-        self.style = None
-        # ABV
-        self.abv = None
-        # Year
-        self.year = None
-        # Description
-        self.description = None
-        # On Tap or Bottle
-        self.availability = None
-        # Price
-        self.price = None
 
 
 if __name__ == '__main__':
