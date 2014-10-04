@@ -215,7 +215,7 @@ class BeerParser(BeverageParser):
             raise ParsingException('Unable to identify remaining beer name pieces: {0}'.format(str(pieces)))
 
 
-def parse_menu(html, location, date):
+def parse_menu(html):
     return parse_sections(html)
 
 
@@ -372,7 +372,7 @@ if __name__ == '__main__':
     url = url_from_arg(args.filename, locations)
     # TODO: handle read failure
     contents = urllib2.urlopen(url).read()
-    beverages = parse_menu(contents, 'Studio City', datetime.now())
+    beverages = parse_menu(contents)
     beverages_flat = flatten_beverages(beverages)
 
     # Output beverage data as JSON
