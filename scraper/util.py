@@ -73,6 +73,7 @@ def expand_menu_scrape(data):
     if data['location']:
         menu_scrape.location = expand_location(data['location'])
     menu_scrape.beverages = expand_beverages(data['beverages'])
+    return menu_scrape
 
 
 def flatten_location(location):
