@@ -6,12 +6,10 @@ Find new beers to drink.
 TODO
 ----
 
-- Combine separate ball and chain and stout beer notifier into single package
-- Standardize scraping
- - Separate menu diff from scraping. Scraping should simply generate beverage data. Menu diff can run afterwards.
+- Update scraper and menu diff to handle scrapers return Beverage[] now.
+- Separate menu diff from scraping. Scraping should simply generate beverage data. Menu diff can run afterwards.
 - Get ball and chain into scraper
 - Get ball and chain into menu diff
-- Add metadata to scrape (menu?)
 
 Scrapers
 --------
