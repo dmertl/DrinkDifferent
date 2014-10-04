@@ -40,9 +40,9 @@ class Location(object):
         # Location name
         self.name = name
         # Beverage menu URL
-        self.url = None
+        self.url = url
         # Chain name
-        self.chain = None
+        self.chain = chain
 
 
 class MenuScrape(object):
