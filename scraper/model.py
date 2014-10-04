@@ -40,6 +40,10 @@ class Beverage(object):
         else:
             return self.name == other.name
 
+    def __hash__(self):
+        # TODO: This isn't really unique and may be problematic, but it makes intersection() work
+        return hash(str(self.untappd_id) + str(self.name))
+
 
 class Location(object):
     def __init__(self, name=None, url=None, chain=None):
