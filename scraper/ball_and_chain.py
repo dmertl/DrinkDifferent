@@ -7,6 +7,7 @@ import base
 from bs4 import BeautifulSoup
 from model import Beverage, Location
 from scraper.util import flatten_beverages, url_from_arg
+from unidecode import unidecode
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
@@ -60,6 +61,8 @@ class Scraper(base.Scraper):
                         'Unable to parse company and name from on tap beverage. string={0}'.format(element.string))
                     name = pieces[0].strip()
                     company = None
+                if type(name) is unicode:
+                    name = unidecode(name)
                 beverage.name = name
                 beverage.company = company
             elif element.name == 'h3':
@@ -95,6 +98,8 @@ class Scraper(base.Scraper):
                     pieces = bev.strip().split(' $')
                     if len(pieces) == 2:
                         name = pieces[0]
+                        if type(name) is unicode:
+                            name = unidecode(name)
                         price = float(pieces[1].replace('$', ''))
                         beverage = Beverage()
                         beverage.name = name
