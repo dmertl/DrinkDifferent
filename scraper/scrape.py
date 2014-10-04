@@ -8,6 +8,7 @@ import re
 
 # Scraper modules
 from scraper.model import MenuScrape
+from scraper.util import flatten_menu_scrape
 import stout
 import ball_and_chain
 
@@ -40,28 +41,24 @@ def scrape_location(location, scraper):
         _log('Unable to retrieve menu from {0}'.format(location.url), logging.ERROR)
 
 
-def cache_menu(menu, location, time):
+def cache_menu(menu_scrape):
     """
-    Cache the parsed menu JSON on the filesystem organized by date.
+    Cache the scraped menu data on the filesystem.
 
-    :param menu: Parsed menu JSON.
-    :type menu: str
-    :param location: Stout location menu is for.
-    :type location: dict
-    :param time: When menu was downloaded.
-    :type time: datetime
+    :param menu_scrape: Scraped menu.
+    :type menu_scrape: MenuScrape
     :return: Path to the cached file.
     :rtype: str
     """
     # Name files menu_YYYY-MM-DD_location.json
-    file_path = _build_cache_path(location['name'], time=time)
+    file_path = _build_cache_path(menu_scrape.location.name, time=menu_scrape.date)
     # Organize cache into directories by location/year/month
     directory = os.path.dirname(file_path)
     if not os.path.exists(directory):
         os.makedirs(directory)
     # Write file
     with open(file_path, 'w') as fh:
-        fh.write(json.dumps(menu))
+        fh.write(json.dumps(flatten_menu_scrape(menu_scrape)))
     return file_path
 
 

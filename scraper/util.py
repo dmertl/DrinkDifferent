@@ -19,6 +19,23 @@ def flatten_beverages(beverages):
     return flat
 
 
+def flatten_menu_scrape(menu_scrape):
+    """
+    Convert a MenuScrape into a flat format that can easily be dumped to JSON.
+
+    :param menu_scrape: MenuScrape
+    :type menu_scrape: MenuScrape
+    :return:
+    :rtype: dict
+    """
+    return {
+        'location': menu_scrape.location.__dict__.copy(),
+        'url': menu_scrape.url,
+        'date': menu_scrape.date.isoformat() if menu_scrape.date else None,
+        'beverages': flatten_beverages(menu_scrape.beverages)
+    }
+
+
 def url_from_arg(arg, locations):
     """
     Determine actual URL from scrape request argument.
