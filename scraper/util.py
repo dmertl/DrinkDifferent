@@ -13,7 +13,7 @@ def scrape_to_dict(menu_scrape):
     d = {
         'location': menu_scrape.location.__dict__.copy(),
         'url': menu_scrape.url,
-        'date': menu_scrape.date.isoformat(),
+        'date': menu_scrape.date.isoformat() if menu_scrape.date else None,
         'beverages': []
     }
     for beverage in menu_scrape.beverages:

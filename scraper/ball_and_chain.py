@@ -5,7 +5,9 @@ import sys
 import urllib2
 import json
 from bs4 import BeautifulSoup
-from model import Beverage
+from model import Beverage, MenuScrape, Location
+from datetime import datetime
+from scraper.util import scrape_to_dict
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
@@ -16,10 +18,21 @@ class Scraper(object):
         pass
 
     def scrape(self, url):
+        """
+
+        :param url:
+        :type url:
+        :return:
+        :rtype: MenuScrape
+        """
+        # TODO: real location
+        location = Location('Hollywood', None, 'Ball and Chain')
+        menu_scrape = MenuScrape(location, url, datetime.now())
         if os.path.exists(url):
-            return self.scrape_file(url)
+            menu_scrape.beverages = self.scrape_file(url)
         else:
-            return self.scrape_url(url)
+            menu_scrape.beverages = self.scrape_url(url)
+        return menu_scrape
 
     def scrape_file(self, file):
         contents = urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath(file)))).read()
@@ -52,7 +65,7 @@ class Scraper(object):
                 beverage = Beverage()
                 beverage.type = 'Beer'
                 beverage.availability = 'On Tap'
-                pieces = element.string.split('-')
+                pieces = element.text.split('-')
                 if len(pieces) == 2:
                     company = pieces[0].strip()
                     name = pieces[1].strip()
@@ -96,7 +109,7 @@ class Scraper(object):
                     pieces = bev.strip().split(' $')
                     if len(pieces) == 2:
                         name = pieces[0]
-                        price = pieces[1].replace('$', '')
+                        price = float(pieces[1].replace('$', ''))
                         beverage = Beverage()
                         beverage.name = name
                         beverage.price = price
@@ -128,13 +141,11 @@ if __name__ == '__main__':
 
     # Run scraper
     scraper = Scraper()
-    beverages = scraper.scrape(args.url)
+    menu_scrape = scraper.scrape(args.url)
+    menu_dict = scrape_to_dict(menu_scrape)
 
     # Output beverage data as JSON
-    beverages_dict = []
-    for beverage in beverages:
-        beverages_dict.append(beverage.__dict__)
     if args.pretty:
-        print json.dumps(beverages_dict, indent=2)
+        print json.dumps(menu_dict, indent=2)
     else:
-        print json.dumps(beverages_dict)
+        print json.dumps(menu_dict)
