@@ -21,3 +21,20 @@ def scrape_to_dict(menu_scrape):
             dict((k, v) for k, v in beverage.__dict__.iteritems() if v)
         )
     return d
+
+
+def flatten_beverages(beverages):
+    """
+    Convert a list of beverages into a flat format that can easily be dumped to JSON.
+
+    :param beverages:
+    :type beverages: Beverage[]
+    :return:
+    :rtype: dict[]
+    """
+    flat = []
+    for beverage in beverages:
+        flat.append(
+            dict((k, v) for k, v in beverage.__dict__.iteritems() if v)
+        )
+    return flat
