@@ -1,9 +1,9 @@
 import logging
 import argparse
-import os
 import sys
 import urllib2
 import json
+import base
 from bs4 import BeautifulSoup
 from model import Beverage, Location
 from scraper.util import flatten_beverages, url_from_arg
@@ -17,7 +17,7 @@ locations = [
 ]
 
 
-class Scraper(object):
+class Scraper(base.Scraper):
     def __init__(self):
         pass
 

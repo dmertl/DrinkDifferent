@@ -6,48 +6,38 @@ from datetime import datetime, timedelta
 import sys
 import re
 
+# Scraper modules
+from scraper.model import MenuScrape
 import stout
-
+import ball_and_chain
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.INFO)
 
-locations = [
-    {
-        'name': 'Hollywood',
-        'url': 'http://www.stoutburgersandbeers.com/hollywood-beer-menu/'
-    },
-    {
-        'name': 'Studio City',
-        'url': 'http://www.stoutburgersandbeers.com/studio-city-beer-menu/'
-    },
-    {
-        'name': 'Santa Monica',
-        'url': 'http://www.stoutburgersandbeers.com/santa-monica-beer-menu/'
-    },
-]
 # Root cache directory
 cache_root = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'menu_cache')
 
 
-def scrape_location(location):
+def scrape_location(location, scraper):
     """
-    Scrape the stout menu, parse it into JSON, and cache it by date.
+    Scrape all beverages from a location.
 
-    :param location: Stout location to scrape.
-    :type location: dict
+    :param location: Location to scrape
+    :type location: Location
+    :param scraper: Scraper to use
+    :type scraper: base.Scraper
     :return:
     :rtype:
     """
-    _log('Scraping {0} - {1}'.format(location['name'], location['url']), logging.INFO)
-    menu_html = urllib2.urlopen(location['url']).read()
+    _log('Scraping {0} - {1}'.format(location.name, location.url), logging.INFO)
+    menu_scrape = MenuScrape(location, location.url, datetime.now())
+    menu_html = urllib2.urlopen(location.url).read()
     if menu_html:
         _log('Read {0} bytes'.format(len(menu_html)), logging.INFO)
-        scrape_time = datetime.now()
-        menu_json = stout.parse_menu(menu_html, location['name'], scrape_time)
-        cache_menu(menu_json, location, scrape_time)
+        menu_scrape.beverages = scraper.scrape(menu_html)
+        cache_menu(menu_scrape)
     else:
-        _log('Unable to retrieve menu from {0}'.format(location['url']), logging.ERROR)
+        _log('Unable to retrieve menu from {0}'.format(location.url), logging.ERROR)
 
 
 def cache_menu(menu, location, time):
@@ -151,5 +141,10 @@ if __name__ == '__main__':
     sh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
     root_log.addHandler(sh)
 
-    for loc in locations:
-        scrape_location(loc)
+    # Stout
+    for loc in stout.locations:
+        scrape_location(loc, stout.Scraper())
+
+    # Ball and Chain
+    for loc in ball_and_chain.locations:
+        scrape_location(loc, ball_and_chain.Scraper())

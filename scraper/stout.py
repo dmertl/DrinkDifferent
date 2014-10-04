@@ -1,18 +1,15 @@
 import argparse
-import os
 import json
 import logging
 import re
 import urllib2
-from datetime import datetime
-
+import sys
 # TODO: Migrate to beautiful soup
 from lxml.html import fromstring
 from unidecode import unidecode
-
-import sys
-from scraper.model import MenuScrape, Location, Beverage
+from scraper.model import Location, Beverage
 from scraper.util import url_from_arg, flatten_beverages
+import base
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
@@ -22,6 +19,12 @@ locations = [
     Location('Studio City', 'http://www.stoutburgersandbeers.com/studio-city-beer-menu/', 'Stout'),
     Location('Santa Monica', 'http://www.stoutburgersandbeers.com/santa-monica-beer-menu/', 'Stout'),
 ]
+
+# TODO: Move old code into Scraper
+class Scraper(base.Scraper):
+    def scrape(self, html):
+        return parse_menu(html)
+
 
 class ParsingException(Exception):
     pass
@@ -37,6 +40,7 @@ class BeverageParser:
 
 class BeverageParsingStrategy:
     pass
+
 
 # TODO: Get rid of wine parsing
 class WineParsingStrategy(BeverageParsingStrategy):
@@ -75,6 +79,7 @@ class WineParser(BeverageParser):
 
 class BeveragePieceStrategy:
     pass
+
 
 # TODO: Simplify all the strategy nonsense, use regex or something
 class AlcoholPercentagePieceStrategy(BeveragePieceStrategy):
@@ -370,7 +375,6 @@ if __name__ == '__main__':
 
     # Run scraper
     url = url_from_arg(args.filename, locations)
-    # TODO: handle read failure
     contents = urllib2.urlopen(url).read()
     beverages = parse_menu(contents)
     beverages_flat = flatten_beverages(beverages)
