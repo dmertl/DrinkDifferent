@@ -11,6 +11,7 @@ TODO
  - Separate menu diff from scraping. Scraping should simply generate beverage data. Menu diff can run afterwards.
 - Get ball and chain into scraper
 - Get ball and chain into menu diff
+- Add metadata to scrape (menu?)
 
 Scrapers
 --------

@@ -6,10 +6,12 @@ import re
 import urllib2
 from datetime import datetime
 
+# TODO: Migrate to beautiful soup
 from lxml.html import fromstring
 from unidecode import unidecode
 
 import sys
+from scraper.model import MenuScrape, Location, Beverage
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
@@ -30,7 +32,7 @@ class BeverageParser:
 class BeverageParsingStrategy:
     pass
 
-
+# TODO: Get rid of wine parsing
 class WineParsingStrategy(BeverageParsingStrategy):
     """
         Campagnola / Pinot Grigio / 2010 / Veneto
@@ -68,7 +70,7 @@ class WineParser(BeverageParser):
 class BeveragePieceStrategy:
     pass
 
-
+# TODO: Simplify all the strategy nonsense, use regex or something
 class AlcoholPercentagePieceStrategy(BeveragePieceStrategy):
     def parse(self, name):
         if name.endswith('%'):
@@ -208,12 +210,13 @@ class BeerParser(BeverageParser):
 
 
 def parse_menu(html, location, date):
-    # TODO: parse location from menu
-    return {
-        'location': location,
-        'parsed': str(date),
-        'sections': parse_sections(html)
-    }
+    # TODO: get actual URL
+    url = ''
+    # TODO: pass in actual location
+    loc = Location(location, url, 'Stout')
+    menu_scrape = MenuScrape(loc, url, date)
+    menu_scrape.beverages = parse_sections(html)
+    return menu_scrape
 
 
 def parse_sections(html):
@@ -224,6 +227,8 @@ def parse_sections(html):
     :return:
     :rtype: dict
     """
+    beverages = []
+    # TODO: remove section shit
     parsed_sections = []
 
     tree = fromstring(html)
@@ -249,14 +254,15 @@ def parse_sections(html):
             section_count += 1
             section = _parse_section(header_element, section_element, section_count)
             try:
-                parsed_sections.append(section)
+                beverages += section['beverages']
+                # parsed_sections.append(section)
             except ParsingException as e:
                 _log(str(e), logging.WARN)
     else:
         _log('Unable to find "div#second-menu" when parsing menu.', logging.ERROR)
         raise ParsingException('Unable to find "div#second-menu" when parsing menu.')
 
-    return parsed_sections
+    return beverages
 
 
 def _parse_section(header_element, section_element, section_count):
@@ -291,7 +297,8 @@ def _parse_section(header_element, section_element, section_count):
             beverage_count += 1
             try:
                 beverage = _parse_beverage(beverage_element, section['type'] == 'wine', beverage_count, section_count)
-                _log('Parsed beverage {0} "{1}".'.format(beverage_count, beverage['name']))
+                _log('Parsed beverage {0} "{1}".'.format(beverage_count, beverage.name))
+                # _log('Parsed beverage {0} "{1}".'.format(beverage_count, beverage['name']))
                 section['beverages'].append(beverage)
             except ParsingException as e:
                 _log(str(e), logging.DEBUG)
@@ -311,7 +318,7 @@ def _parse_beverage(beverage_element, is_wine, beverage_count, section_count):
     :param section_count:
     :type section_count: int
     :return:
-    :rtype: dict
+    :rtype: Beverage
     """
     # .title element contains the beverage name
     name = beverage_element.xpath('.//p[@class="title"]')
@@ -321,11 +328,10 @@ def _parse_beverage(beverage_element, is_wine, beverage_count, section_count):
             if type(name) is unicode:
                 # Convert any fancy unicode characters to more common ascii equivalents
                 name = unidecode(name)
-            beverage = {
-                'name': name
-            }
+            beverage = Beverage(name)
+            # TODO: apply the details to Beverage
             try:
-                beverage['details'] = _parse_beverage_details(name, is_wine)
+                details = _parse_beverage_details(name, is_wine)
             except ParsingException as e:
                 _log(str(e), logging.DEBUG)
             return beverage
@@ -371,12 +377,21 @@ if __name__ == '__main__':
 
     if contents:
         # Parse menu
-        menu = parse_menu(contents, 'Studio City', datetime.now())
+        menu_scrape = parse_menu(contents, 'Studio City', datetime.now())
 
-        # Output parsed menu as JSON
+        # Output beverage data as JSON
+        beverages_dict = []
+        for beverage in menu_scrape.beverages:
+            beverages_dict.append(beverage.__dict__)
         if args.pretty:
-            print json.dumps(menu, indent=2)
+            print json.dumps(beverages_dict, indent=2)
         else:
-            print json.dumps(menu)
+            print json.dumps(beverages_dict)
+        #
+        # # Output parsed menu as JSON
+        # if args.pretty:
+        #     print json.dumps(menu, indent=2)
+        # else:
+        #     print json.dumps(menu)
     else:
         print 'Unable to read menu from "{0}".'.format(filename)
