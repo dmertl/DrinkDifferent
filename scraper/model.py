@@ -1,5 +1,7 @@
 __author__ = 'dmertl'
 
+from datetime import datetime
+
 
 class Beverage(object):
     def __init__(self, name=None):
@@ -44,12 +46,12 @@ class Location(object):
 
 
 class MenuScrape(object):
-    def __init__(self, location=None, url=None, beverages=None, date=None):
+    def __init__(self, location=None, url=None, date=None, beverages=None):
         # Location scraped
         self.location = location
         # URL scraped
         self.url = url
-        # Beverages found
-        self.beverages = beverages
         # Date of scraping
-        self.date = date
+        self.date = date or datetime.now
+        # Beverages found
+        self.beverages = beverages or []
