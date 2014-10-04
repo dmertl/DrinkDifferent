@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import sys
 import re
 
-import parse_menu
+import stout
 
 
 root_log = logging.getLogger()
@@ -44,7 +44,7 @@ def scrape_location(location):
     if menu_html:
         _log('Read {0} bytes'.format(len(menu_html)), logging.INFO)
         scrape_time = datetime.now()
-        menu_json = parse_menu.parse_menu(menu_html, location['name'], scrape_time)
+        menu_json = stout.parse_menu(menu_html, location['name'], scrape_time)
         cache_menu(menu_json, location, scrape_time)
     else:
         _log('Unable to retrieve menu from {0}'.format(location['url']), logging.ERROR)
