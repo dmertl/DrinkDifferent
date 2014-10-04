@@ -54,17 +54,17 @@ class Scraper(base.Scraper):
                 beverage.availability = 'On Tap'
                 pieces = element.text.split('-')
                 if len(pieces) == 2:
-                    company = pieces[0].strip()
+                    brewery = pieces[0].strip()
                     name = pieces[1].strip()
                 else:
                     root_log.warn(
-                        'Unable to parse company and name from on tap beverage. string={0}'.format(element.string))
+                        'Unable to parse brewery and name from on tap beverage. string={0}'.format(element.string))
                     name = pieces[0].strip()
-                    company = None
+                    brewery = None
                 if type(name) is unicode:
                     name = unidecode(name)
                 beverage.name = name
-                beverage.company = company
+                beverage.brewery = brewery
             elif element.name == 'h3':
                 # h3 is Location
                 beverage.location = element.string.strip()
