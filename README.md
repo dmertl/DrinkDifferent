@@ -10,6 +10,7 @@ TODO
 - Separate menu diff from scraping. Scraping should simply generate beverage data. Menu diff can run afterwards.
 - Get ball and chain into menu diff
 - Create a script to rename existing cache files into new format (menu_2014-08-26_santa_monica to 2014-08-26_stout_santa-monica)
+- Move caching into its own module
 
 Scrapers
 --------
@@ -163,17 +164,3 @@ Unit Tests
 ----------
 
 Someday
-
-Old Notes From BallAndChainScraper
-----------------------------------
-
-Scrapes beverage data from http://www.ball-and-chain-restaurant.com/ and converts to JSON.
-
-Ideas
-=====
-
-- Combine into bigger Drink Different project. Multiple scrapers, find new beers in lots of locations.
- - Define an interface for the scrapers
-- Link beverages with untappd records.
- - For now manually search and provide IDs
- - Cache name -> ID for future lookup
