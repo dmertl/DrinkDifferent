@@ -13,7 +13,7 @@ def cache_menu_scrape(menu_scrape):
     Cache the scraped menu data on the filesystem.
 
     :param menu_scrape: Scraped menu.
-    :type menu_scrape: MenuScrape
+    :type menu_scrape: model.MenuScrape
     :return: Path to the cached file.
     :rtype: str
     """
