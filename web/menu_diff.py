@@ -4,50 +4,15 @@ import json
 import logging
 import urllib2
 import sys
-from datetime import datetime
+from scraper.util import expand_menu_scrape, flatten_beverages
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
 
+
 class DiffException(Exception):
     pass
 
-#
-# def diff(original, modified):
-#     _diff = {
-#         'old_date': datetime.strptime(original['parsed'], '%Y-%m-%d %H:%M:%S.%f'),
-#         'new_date': datetime.strptime(modified['parsed'], '%Y-%m-%d %H:%M:%S.%f'),
-#         'added': [],
-#         'removed': []
-#     }
-#
-#     for section in modified['sections']:
-#         o_section = None
-#         for s in original['sections']:
-#             if s['name'] == section['name']:
-#                 o_section = s
-#         for beverage in section['beverages']:
-#             o_beverage = None
-#             for b in o_section['beverages']:
-#                 if b['name'] == beverage['name']:
-#                     o_beverage = b
-#             if not o_beverage:
-#                 _diff['added'].append({'section': section['name'], 'beverage': beverage['name']})
-#
-#     for section in original['sections']:
-#         m_section = None
-#         for s in modified['sections']:
-#             if s['name'] == section['name']:
-#                 m_section = s
-#         for beverage in section['beverages']:
-#             m_beverage = None
-#             for b in m_section['beverages']:
-#                 if b['name'] == beverage['name']:
-#                     m_beverage = b
-#             if not m_beverage:
-#                 _diff['removed'].append({'section': section['name'], 'beverage': beverage['name']})
-#
-#     return _diff
 
 def diff_beverages(old_beverages, new_beverages):
     """
@@ -65,6 +30,7 @@ def diff_beverages(old_beverages, new_beverages):
     added = set(new_beverages).symmetric_difference(unchanged)
     return added, removed
 
+
 def _log(message, level=logging.INFO):
     root_log.log(level, message)
 
@@ -77,29 +43,35 @@ if __name__ == '__main__':
     root_log.addHandler(sh)
 
     # Command line arguments
-    parser = argparse.ArgumentParser(description='Create a diff from two menu scrapings.')
-    parser.add_argument('original', type=str, help='file path to original menu')
-    parser.add_argument('modified', type=str, help='file path to modified menu')
+    parser = argparse.ArgumentParser(description='Find beverages that were added or removed between menu scrapings.')
+    parser.add_argument('old', type=str, help='path to old menu scraping file')
+    parser.add_argument('new', type=str, help='path to new menu scraping file')
     parser.add_argument('--pretty', action='store_true', help='pretty print JSON output')
     args = parser.parse_args()
 
-    # Get file contents
-    if os.path.exists(args.original):
-        original_contents = urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath(args.original)))).read()
-        original_json = json.loads(original_contents)
-    else:
-        raise DiffException('Unable to open file "{0}".'.format(args.original))
-    if os.path.exists(args.modified):
-        modified_contents = urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath(args.modified)))).read()
-        modified_json = json.loads(modified_contents)
-    else:
-        raise DiffException('Unable to open file "{0}".'.format(args.modified))
+    # Load menus
+    old = expand_menu_scrape(
+        json.loads(
+            urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath(args.old)))).read()
+        )
+    )
+    new = expand_menu_scrape(
+        json.loads(
+            urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath(args.new)))).read()
+        )
+    )
 
-    # Create diff of menus
-    menu_diff = diff(original_json, modified_json)
+    # Find differences in beverages
+    added, removed = diff_beverages(old.beverages, new.beverages)
+    flat = {
+        'old_date': old.date.isoformat(),
+        'new_date': new.date.isoformat(),
+        'added': flatten_beverages(added),
+        'removed': flatten_beverages(removed)
+    }
 
     # Output diff as JSON
     if args.pretty:
-        print json.dumps(menu_diff, indent=2)
+        print json.dumps(flat, indent=2)
     else:
-        print json.dumps(menu_diff)
+        print json.dumps(flat)
