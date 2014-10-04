@@ -12,6 +12,7 @@ from unidecode import unidecode
 
 import sys
 from scraper.model import MenuScrape, Location, Beverage
+from scraper.util import scrape_to_dict
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
@@ -376,22 +377,11 @@ if __name__ == '__main__':
         contents = urllib2.urlopen(filename).read()
 
     if contents:
-        # Parse menu
         menu_scrape = parse_menu(contents, 'Studio City', datetime.now())
-
-        # Output beverage data as JSON
-        beverages_dict = []
-        for beverage in menu_scrape.beverages:
-            beverages_dict.append(beverage.__dict__)
+        menu_dict = scrape_to_dict(menu_scrape)
         if args.pretty:
-            print json.dumps(beverages_dict, indent=2)
+            print json.dumps(menu_dict, indent=2)
         else:
-            print json.dumps(beverages_dict)
-        #
-        # # Output parsed menu as JSON
-        # if args.pretty:
-        #     print json.dumps(menu, indent=2)
-        # else:
-        #     print json.dumps(menu)
+            print json.dumps(menu_dict)
     else:
         print 'Unable to read menu from "{0}".'.format(filename)
