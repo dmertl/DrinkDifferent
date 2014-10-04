@@ -16,7 +16,7 @@ class DiffException(Exception):
 
 def diff_beverages(old_beverages, new_beverages):
     """
-    Return the difference in beverages between an old list and a new list. Uses beverage name for comparison.
+    Return the difference in beverages between an old list and a new list.
 
     :param old_beverages: Old beverage list.
     :type old_beverages: Beverage[]
