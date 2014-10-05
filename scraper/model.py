@@ -2,6 +2,8 @@ __author__ = 'dmertl'
 
 from datetime import datetime
 
+data_version = '2.0.0'
+
 
 class Beverage(object):
     def __init__(self, name=None):
@@ -33,6 +35,8 @@ class Beverage(object):
         self.untappd_id = None
         # Untappd brewery ID
         self.untappd_brewery_id = None
+        # Beverage info as scraped (prior to parsing)
+        self.scraped_value = None
 
     def __eq__(self, other):
         if self.untappd_id and other.untappd_id:
@@ -56,7 +60,7 @@ class Location(object):
 
 
 class MenuScrape(object):
-    def __init__(self, location=None, url=None, date=None, beverages=None):
+    def __init__(self, location=None, url=None, date=None, beverages=None, version=data_version):
         # Location scraped
         self.location = location
         # URL scraped
@@ -65,3 +69,5 @@ class MenuScrape(object):
         self.date = date or datetime.now
         # Beverages found
         self.beverages = beverages or []
+        # Data format version number
+        self.version = version
