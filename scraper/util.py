@@ -53,7 +53,8 @@ def flatten_menu_scrape(menu_scrape):
         'location': flatten_location(menu_scrape.location),
         'url': menu_scrape.url,
         'date': menu_scrape.date.isoformat() if menu_scrape.date else None,
-        'beverages': flatten_beverages(menu_scrape.beverages)
+        'beverages': flatten_beverages(menu_scrape.beverages),
+        'version': menu_scrape.version
     }
 
 
