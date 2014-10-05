@@ -6,7 +6,10 @@ Find new beers to drink.
 TODO
 ----
 
-- Create a script to rename existing cache files into new format (menu_2014-08-26_santa_monica to 2014-08-26_stout_santa-monica)
+- Get details back into stout scraping
+- Better scraping for edge cases in BAC
+- Remove wine from stout
+- Cleanup stout
 
 Scrapers
 --------
@@ -35,6 +38,7 @@ Menu Diff
 - Allow simple login and show diff since last viewing.
 - Allow user to save a date in a cookie.
 - Integrate with Foursquare to get last check-in date.
+- Compare beer selection across locations or chains
 
 Beer Checklist
 --------------
