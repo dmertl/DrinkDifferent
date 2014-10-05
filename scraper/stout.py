@@ -35,131 +35,6 @@ class ExtractionException(ParsingException):
     pass
 
 
-class Extractor(object):
-    @abstractmethod
-    def extract(self, value):
-        pass
-
-
-class VolumeExtractor(Extractor):
-    def extract(self, value):
-        search = re.search('(([0-9\.]+)(oz|ml))', value)
-        if search and len(search.groups()) == 3:
-            try:
-                return {
-                    'value': value.replace(search.group(1), ''),
-                    'volume': float(search.group(2)),
-                    'volume_units': search.group(3)
-                }
-            except ValueError:
-                pass
-        raise ExtractionException()
-
-
-class AbvExtractor(Extractor):
-    def extract(self, value):
-        search = re.search('(([0-9\.]+)%)', value)
-        if search and len(search.groups()) == 2:
-            try:
-                return {
-                    'value': value.replace(search.group(1), ''),
-                    'abv': float(search.group(2))
-                }
-            except ValueError:
-                pass
-        raise ExtractionException()
-
-
-class PriceExtractor(Extractor):
-    def extract(self, value):
-        search = re.search('(\$([0-9\.]+))', value)
-        if search and len(search.groups()) == 2:
-            try:
-                return {
-                    'value': value.replace(search.group(1), ''),
-                    'price': float(search.group(2))
-                }
-            except ValueError:
-                pass
-        raise ExtractionException()
-
-
-# TODO: how do we detect:
-# Weihenstephaner Original - Germ / Helles Lager / 5.1%
-# <name> - <loc> / <style> / <alc>%
-class NameBreweryExtractor(Extractor):
-    def extract(self, value):
-        search = re.search('(^([^-]+)-([^/]+)/)', value)
-        if search and len(search.groups()) == 3:
-            return {
-                'value': value.replace(search.group(1), ''),
-                'name': search.group(2).strip(),
-                'brewery': search.group(3).strip()
-            }
-        else:
-            search = re.search('(^([^/]+)/)', value)
-            if search and len(search.groups()) == 2:
-                return {
-                    'value': value.replace(search.group(1), ''),
-                    'name': search.group(2).strip()
-                }
-        raise ExtractionException()
-
-
-class LocationStyleExtractor(Extractor):
-    def extract(self, value):
-        search = re.search('(^([^/]+)/([^/]+))', value)
-        if search and len(search.groups()) == 3:
-            return {
-                'value': value.replace(search.group(1), ''),
-                'location': search.group(2).strip(),
-                'style': search.group(3).strip()
-            }
-        raise ExtractionException()
-
-
-class BeerParser(object):
-    def __init__(self):
-        self.extractors = [
-            VolumeExtractor(),
-            AbvExtractor(),
-            PriceExtractor(),
-            NameBreweryExtractor(),
-            LocationStyleExtractor()
-        ]
-
-    def parse(self, value):
-        beverage = Beverage()
-        beverage.type = 'Beer'
-        beverage.scraped_value = value
-        value = self.prep(value)
-        for extractor in self.extractors:
-            try:
-                data = extractor.extract(self.clean(value))
-                value = data.get('value')
-                del data['value']
-                for k, v in data.iteritems():
-                    beverage.__setattr__(k, v)
-            except ExtractionException:
-                # TODO: log
-                pass
-        if beverage.name:
-            beverage.availability = 'Bottle' if beverage.volume else 'On Tap'
-            return beverage
-        else:
-            raise ParsingException()
-
-    def clean(self, value):
-        return re.sub('/[\s/]+/', '/', value)
-
-    def prep(self, value):
-        # Convert any fancy unicode characters to more common ascii equivalents
-        if type(value) is unicode:
-            value = unidecode(value)
-        # Handle some troublesome strings
-        return value.replace('w/', 'with ').replace('IPAw / ', 'IPA with ')
-
-
 def parse_menu(html):
     return parse_sections(html)
 
@@ -280,6 +155,185 @@ def _parse_beverage(beverage_element, is_wine, beverage_count, section_count):
     else:
         raise ParsingException(
             'Unable to find "p.title" in section {0} item {1}.'.format(section_count, beverage_count))
+
+
+class BeerParser(object):
+    def __init__(self):
+        self.extractors = [
+            VolumeExtractor(),
+            AbvExtractor(),
+            PriceExtractor(),
+            NameBreweryExtractor(),
+            LocationStyleExtractor()
+        ]
+
+    def parse(self, value):
+        """
+        Parse a beverage string into a Beverage.
+
+        TODO: Support conditional extractors. If extract X fails, run extractor Y.
+        :param value:
+        :type value: str
+        :return:
+        :rtype: Beverage
+        """
+        beverage = Beverage()
+        beverage.type = 'Beer'
+        beverage.scraped_value = value
+        value = self.prep(value)
+        for extractor in self.extractors:
+            try:
+                data = extractor.extract(self.clean(value))
+                value = data.get('__value')
+                del data['__value']
+                for k, v in data.iteritems():
+                    beverage.__setattr__(k, v)
+            except ExtractionException as e:
+                _log(str(e), logging.DEBUG)
+                pass
+        if beverage.name:
+            beverage.availability = 'Bottle' if beverage.volume else 'On Tap'
+            return beverage
+        else:
+            raise ParsingException()
+
+    def clean(self, value):
+        """
+        Remove any extraction artifacts.
+
+        :param value:
+        :type value: str
+        :return:
+        :rtype: str
+        """
+        return re.sub('/[\s/]+/', '/', value)
+
+    def prep(self, value):
+        """
+        Prepare beverage string before any extraction is done. Helps with edge cases.
+
+        :param value:
+        :type value: str
+        :return:
+        :rtype: str
+        """
+        # Convert any fancy unicode characters to more common ascii equivalents
+        if type(value) is unicode:
+            value = unidecode(value)
+        # Handle some troublesome strings
+        return value.replace('w/', 'with ').replace('IPAw / ', 'IPA with ')
+
+
+class Extractor(object):
+    @abstractmethod
+    def extract(self, value):
+        """
+        Extract beverage data from a string. Returned dictionary has keys corresponding to Beverage variables. Includes
+        an extra '__value' key that holds the value after the extracted data is removed. Helpful when leaving data
+        could confuse further parsing.
+
+        :param value: Beverage string.
+        :type value: str
+        :return: Extracted beverage data.
+        :rtype: dict
+        """
+        pass
+
+
+class VolumeExtractor(Extractor):
+    def extract(self, value):
+        """
+        Extract volume by searching for "<number><units>".
+        """
+        search = re.search('(([0-9\.]+)(oz|ml))', value)
+        if search and len(search.groups()) == 3:
+            try:
+                return {
+                    '__value': value.replace(search.group(1), ''),
+                    'volume': float(search.group(2)),
+                    'volume_units': search.group(3)
+                }
+            except ValueError:
+                raise ExtractionException(
+                    'Unable to convert volume to float. volume={}, value={}'.format(search.group(2), value))
+        raise ExtractionException('Unable to extract volume. value={}'.format(value))
+
+
+class AbvExtractor(Extractor):
+    def extract(self, value):
+        """
+        Extract ABV by searching for "<number>%".
+        """
+        search = re.search('(([0-9\.]+)%)', value)
+        if search and len(search.groups()) == 2:
+            try:
+                return {
+                    '__value': value.replace(search.group(1), ''),
+                    'abv': float(search.group(2))
+                }
+            except ValueError:
+                raise ExtractionException(
+                    'Unable to convert abv to float. volume={}, value={}'.format(search.group(2), value))
+        raise ExtractionException('Unable to extract abv. value={}'.format(value))
+
+
+class PriceExtractor(Extractor):
+    def extract(self, value):
+        """
+        Extract price by searching for "$<number>".
+        """
+        search = re.search('(\$([0-9\.]+))', value)
+        if search and len(search.groups()) == 2:
+            try:
+                return {
+                    '__value': value.replace(search.group(1), ''),
+                    'price': float(search.group(2))
+                }
+            except ValueError:
+                raise ExtractionException(
+                    'Unable to convert price to float. volume={}, value={}'.format(search.group(2), value))
+        raise ExtractionException('Unable to extract price. value={}'.format(value))
+
+
+# TODO: how do we detect:
+# Weihenstephaner Original - Germ / Helles Lager / 5.1%
+# <name> - <loc> / <style> / <alc>%
+class NameBreweryExtractor(Extractor):
+    def extract(self, value):
+        """
+        Extract name and brewery by searching the start of the string for "<name> - <brewery>".
+        """
+        search = re.search('(^([^-]+)-([^/]+)/)', value)
+        if search and len(search.groups()) == 3:
+            return {
+                '__value': value.replace(search.group(1), ''),
+                'name': search.group(2).strip(),
+                'brewery': search.group(3).strip()
+            }
+        else:
+            search = re.search('(^([^/]+)/)', value)
+            if search and len(search.groups()) == 2:
+                return {
+                    '__value': value.replace(search.group(1), ''),
+                    'name': search.group(2).strip()
+                }
+        raise ExtractionException('Unable to extract name or brewery. value={}'.format(value))
+
+
+class LocationStyleExtractor(Extractor):
+    def extract(self, value):
+        """
+        Extract location and style by searching the start of the string for "<location> / <style>". Requires that other
+        data has been removed as location and style are not easily parsable.
+        """
+        search = re.search('(^([^/]+)/([^/]+))', value)
+        if search and len(search.groups()) == 3:
+            return {
+                '__value': value.replace(search.group(1), ''),
+                'location': search.group(2).strip(),
+                'style': search.group(3).strip()
+            }
+        raise ExtractionException('Unable to extract location or style. value={}'.format(value))
 
 
 def _log(message, level=logging.INFO):
