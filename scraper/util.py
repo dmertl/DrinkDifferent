@@ -69,6 +69,7 @@ def expand_menu_scrape(data):
     """
     menu_scrape = MenuScrape()
     menu_scrape.url = data['url']
+    menu_scrape.version = data['version']
     if data['date']:
         menu_scrape.date = dateutil.parser.parse(data['date'])
     if data['location']:
