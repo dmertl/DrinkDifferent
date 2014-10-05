@@ -4,6 +4,7 @@ import logging
 import re
 import urllib2
 import sys
+from abc import abstractmethod
 # TODO: Migrate to beautiful soup
 from lxml.html import fromstring
 from unidecode import unidecode
@@ -30,194 +31,133 @@ class ParsingException(Exception):
     pass
 
 
-class PieceParsingException(Exception):
+class ExtractionException(ParsingException):
     pass
 
 
-class BeverageParser:
-    pass
+class Extractor(object):
+    @abstractmethod
+    def extract(self, value):
+        pass
 
 
-class BeverageParsingStrategy:
-    pass
-
-
-# TODO: Get rid of wine parsing
-class WineParsingStrategy(BeverageParsingStrategy):
-    """
-        Campagnola / Pinot Grigio / 2010 / Veneto
-          <winery> / <style> / <year> / <loc>
-        Don Rodolfo -Malbec / 2010 / Mendoza
-          <winery> -<style> / <year> / <loc>
-    """
-
-    regex = re.compile('^(.+)[/-](.+)/(.+)/(.+)$')
-
-    def parse(self, name):
-        match = self.regex.match(name)
-        if match:
-            return self.get_details(match)
-        else:
-            raise ParsingException('Unable to parse details out of wine name "{0}".'.format(name))
-
-    def get_details(self, match):
-        details = {
-            'winery': match.group(1).strip(),
-            'style': match.group(2).strip(),
-            'year': match.group(3).strip(),
-            'location': match.group(4).strip(),
-            'type': 'wine'
-        }
-        details['name'] = '{0} {1} {2}'.format(details['winery'], details['style'], details['year'])
-        return details
-
-
-class WineParser(BeverageParser):
-    def parse(self, name):
-        return WineParsingStrategy().parse(name)
-
-
-class BeveragePieceStrategy:
-    pass
-
-
-# TODO: Simplify all the strategy nonsense, use regex or something
-class AlcoholPercentagePieceStrategy(BeveragePieceStrategy):
-    def parse(self, name):
-        if name.endswith('%'):
-            return {'alcohol_percentage': name}
-        else:
-            raise PieceParsingException
-
-
-class PricePieceStrategy(BeveragePieceStrategy):
-    def parse(self, name):
-        if name[0] == '$':
-            return {'price': name}
-        else:
-            raise PieceParsingException
-
-
-class SizePieceStrategy(BeveragePieceStrategy):
-    def parse(self, name):
-        if name.endswith(('oz', 'ml')):
-            return {'size': name}
-        else:
-            raise PieceParsingException
-
-
-class NitroPieceStrategy(BeveragePieceStrategy):
-    def parse(self, piece):
-        if piece == 'Nitro':
-            return {'nitro': True}
-        else:
-            raise PieceParsingException
-
-
-class BeerParser(BeverageParser):
-    """
-    Parse beer title into detailed information.
-
-    Split beer on "/" into pieces. Identify data in pieces by formatting or position.
-        Old Speckled Hen - Green King / UK / Cream Ale / Nitro / 5.2%
-          <name> - <brewery> / <loc> / <style> / <nitro> / <alc>%
-        RazzMaTazz - Julian / CA / Rasp Cider / 22oz / 6.9% / $12
-          <name> - <brewery> / <loc> / <style> / <size>oz / <alc>% / $<cost>
-        Saison Dupont Cuvee Dry Hop - Dupont / Belg / Saison / 6.5% / $10
-          <name> - <brewery> / <geo> / <style> / <alc>% / $<cost>
-        Avec Les Bons Voeux 2012 - Dupont / Belg / Xmas Saison / 9.5%
-          <name> <year> - <brewery> / <loc> / <style> / <%>
-        Weihenstephaner Original - Germ / Helles Lager / 5.1%
-          <name> - <loc> / <style> / <alc>%
-    """
-    strategies = [
-        AlcoholPercentagePieceStrategy(),
-        PricePieceStrategy(),
-        SizePieceStrategy(),
-        NitroPieceStrategy()
-    ]
-
-    def parse(self, name):
-        clean_name = self._clean_name(name)
-        pieces = [i.strip() for i in clean_name.split('/')]
-        total_count = len(pieces)
-        if 3 <= len(pieces) <= 6:
-            details = {'type': 'beer'}
-            # First piece is always the name
-            details = dict(details.items() + self._parse_name(pieces[0]).items())
-            del pieces[0]
-
-            # Match easily identifiable pieces
-            unidentified = []
-            for piece in pieces:
-                if len(piece):
-                    parsed = False
-                    for strategy in self.strategies:
-                        try:
-                            details = dict(details.items() + strategy.parse(piece).items())
-                            parsed = True
-                            break
-                        except PieceParsingException:
-                            pass
-                    if not parsed:
-                        unidentified.append(piece)
-
-            # Make assumptions on remaining pieces by position
+class VolumeExtractor(Extractor):
+    def extract(self, value):
+        search = re.search('(([0-9\.]+)(oz|ml))', value)
+        if search and len(search.groups()) == 3:
             try:
-                details = dict(details.items() + self._parse_positional(unidentified, total_count).items())
-            except ParsingException as e:
-                _log('{0} from name {1}'.format(str(e), name), logging.WARN)
-
-            try:
-                details = dict(details.items() + self._parse_year(details['name']).items())
-            except PieceParsingException:
+                return {
+                    'value': value.replace(search.group(1), ''),
+                    'volume': float(search.group(2)),
+                    'volume_units': search.group(3)
+                }
+            except ValueError:
                 pass
+        raise ExtractionException()
 
-            return details
+
+class AbvExtractor(Extractor):
+    def extract(self, value):
+        search = re.search('(([0-9\.]+)%)', value)
+        if search and len(search.groups()) == 2:
+            try:
+                return {
+                    'value': value.replace(search.group(1), ''),
+                    'abv': float(search.group(2))
+                }
+            except ValueError:
+                pass
+        raise ExtractionException()
+
+
+class PriceExtractor(Extractor):
+    def extract(self, value):
+        search = re.search('(\$([0-9\.]+))', value)
+        if search and len(search.groups()) == 2:
+            try:
+                return {
+                    'value': value.replace(search.group(1), ''),
+                    'price': float(search.group(2))
+                }
+            except ValueError:
+                pass
+        raise ExtractionException()
+
+
+# TODO: how do we detect:
+# Weihenstephaner Original - Germ / Helles Lager / 5.1%
+# <name> - <loc> / <style> / <alc>%
+class NameBreweryExtractor(Extractor):
+    def extract(self, value):
+        search = re.search('(^([^-]+)-([^/]+)/)', value)
+        if search and len(search.groups()) == 3:
+            return {
+                'value': value.replace(search.group(1), ''),
+                'name': search.group(2).strip(),
+                'brewery': search.group(3).strip()
+            }
         else:
-            raise ParsingException('Unable to parse beer name: {0}'.format(name))
+            search = re.search('(^([^/]+)/)', value)
+            if search and len(search.groups()) == 2:
+                return {
+                    'value': value.replace(search.group(1), ''),
+                    'name': search.group(2).strip()
+                }
+        raise ExtractionException()
 
-    def _clean_name(self, name):
-        """
-        Clean various shit out of name that screws with the parsing.
-        """
-        return name.replace('w/', 'with ').replace('IPAw / ', 'IPA with ')
 
-    def _parse_name(self, piece):
-        regex = re.compile('^([^-]+)-(.+)$')
-        match = regex.match(piece)
-        if match:
-            return {'name': match.group(1).strip(), 'brewery': match.group(2).strip()}
+class LocationStyleExtractor(Extractor):
+    def extract(self, value):
+        search = re.search('(^([^/]+)/([^/]+))', value)
+        if search and len(search.groups()) == 3:
+            return {
+                'value': value.replace(search.group(1), ''),
+                'location': search.group(2).strip(),
+                'style': search.group(3).strip()
+            }
+        raise ExtractionException()
+
+
+class BeerParser(object):
+    def __init__(self):
+        self.extractors = [
+            VolumeExtractor(),
+            AbvExtractor(),
+            PriceExtractor(),
+            NameBreweryExtractor(),
+            LocationStyleExtractor()
+        ]
+
+    def parse(self, value):
+        beverage = Beverage()
+        beverage.type = 'Beer'
+        beverage.scraped_value = value
+        value = self.prep(value)
+        for extractor in self.extractors:
+            try:
+                data = extractor.extract(self.clean(value))
+                value = data.get('value')
+                del data['value']
+                for k, v in data.iteritems():
+                    beverage.__setattr__(k, v)
+            except ExtractionException:
+                # TODO: log
+                pass
+        if beverage.name:
+            beverage.availability = 'Bottle' if beverage.volume else 'On Tap'
+            return beverage
         else:
-            return {'name': piece}
+            raise ParsingException()
 
-    def _parse_year(self, name):
-        year_re = re.compile('([0-9]{4})')
-        year_match = year_re.search(name)
-        if year_match:
-            year = int(year_match.group(1))
-            if year and year > 1990 and year < 2020:
-                return {'year': year}
-        raise PieceParsingException
+    def clean(self, value):
+        return re.sub('/[\s/]+/', '/', value)
 
-    def _parse_positional(self, pieces, total_count):
-        """
-        Parse the remaining unidentified pieces by position.
-        """
-        details = {}
-        if 1 <= len(pieces) <= 2:
-            # Special case for 3 piece title, style will be only remaining piece
-            if total_count == 3:
-                details['style'] = pieces[0]
-            else:
-                details['location'] = pieces[0]
-                try:
-                    details['style'] = pieces[1]
-                except IndexError:
-                    pass
-            return details
-        else:
-            raise ParsingException('Unable to identify remaining beer name pieces: {0}'.format(str(pieces)))
+    def prep(self, value):
+        # Convert any fancy unicode characters to more common ascii equivalents
+        if type(value) is unicode:
+            value = unidecode(value)
+        # Handle some troublesome strings
+        return value.replace('w/', 'with ').replace('IPAw / ', 'IPA with ')
 
 
 def parse_menu(html):
@@ -330,30 +270,16 @@ def _parse_beverage(beverage_element, is_wine, beverage_count, section_count):
     if name:
         name = name[0].text_content().strip()
         if name:
-            if type(name) is unicode:
-                # Convert any fancy unicode characters to more common ascii equivalents
-                name = unidecode(name)
-            beverage = Beverage(name)
-            # TODO: apply the details to Beverage
             try:
-                details = _parse_beverage_details(name, is_wine)
+                parser = BeerParser()
+                return parser.parse(name)
             except ParsingException as e:
                 _log(str(e), logging.DEBUG)
-            return beverage
         else:
             raise ParsingException('Empty beverage in section {0} item {1}'.format(section_count, beverage_count))
     else:
         raise ParsingException(
             'Unable to find "p.title" in section {0} item {1}.'.format(section_count, beverage_count))
-
-
-def _parse_beverage_details(name, is_wine):
-    if is_wine:
-        parser = WineParser()
-        return parser.parse(name)
-    else:
-        parser = BeerParser()
-        return parser.parse(name)
 
 
 def _log(message, level=logging.INFO):
