@@ -173,7 +173,7 @@ class BeerParser(object):
 
         TODO: Support conditional extractors. If extract X fails, run extractor Y.
         :param value:
-        :type value: str
+        :type value: str|unicode
         :return:
         :rtype: Beverage
         """
@@ -221,7 +221,9 @@ class BeerParser(object):
         if type(value) is unicode:
             value = unidecode(value)
         # Handle some troublesome strings
-        return value.replace('w/', 'with ').replace('IPAw / ', 'IPA with ')
+        return value.replace('w/', 'with ')\
+            .replace('IPAw / ', 'IPA with ')\
+            .replace('Weihenstephaner Original - Germ', 'Weihenstephaner Original - Weihenstephan / Germ')
 
 
 class Extractor(object):
@@ -295,9 +297,6 @@ class PriceExtractor(Extractor):
         raise ExtractionException('Unable to extract price. value={}'.format(value))
 
 
-# TODO: how do we detect:
-# Weihenstephaner Original - Germ / Helles Lager / 5.1%
-# <name> - <loc> / <style> / <alc>%
 class NameBreweryExtractor(Extractor):
     def extract(self, value):
         """
