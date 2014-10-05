@@ -68,13 +68,13 @@ def expand_menu_scrape(data):
     :rtype: MenuScrape
     """
     menu_scrape = MenuScrape()
-    menu_scrape.url = data['url']
-    menu_scrape.version = data['version']
-    if data['date']:
-        menu_scrape.date = dateutil.parser.parse(data['date'])
-    if data['location']:
-        menu_scrape.location = expand_location(data['location'])
-    menu_scrape.beverages = expand_beverages(data['beverages'])
+    menu_scrape.url = data.get('url')
+    menu_scrape.version = data.get('version')
+    if data.get('date'):
+        menu_scrape.date = dateutil.parser.parse(data.get('date'))
+    if data.get('location'):
+        menu_scrape.location = expand_location(data.get('location'))
+    menu_scrape.beverages = expand_beverages(data.get('beverages'))
     return menu_scrape
 
 

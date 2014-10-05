@@ -4,40 +4,42 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Stout beer notifier - Diff</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="/static/FilteredSelect.js"></script>
 </head>
 <body>
 <form method="get">
-    <label for="diff-location">Location</label>
-    <select name="location" id="diff-location">
-        {% for loc in locations %}
-            {% set selected = "selected" if loc == location else ""  %}
-            <option value="{{ loc }}" {{ selected }}>{{ loc }}</option>
+    <label for="diff-chain">Chain</label>
+    <select name="chain" id="diff-chain">
+        {% for c, val in chain_opts.iteritems() %}
+            {% set selected = "selected" if c == chain else "" %}
+            <option value="{{ c }}" {{ selected }}>{{ c }}</option>
         {% endfor %}
     </select>
+    <label for="diff-location">Location</label>
+    <select name="location" id="diff-location"></select>
     <label for="diff-start">Start</label>
-    <input type="date" name="start" id="diff-start" value="{{ start }}" />
+    <input type="date" name="start" id="diff-start" value="{{ start }}"/>
     <label for="diff-end">End</label>
     <input type="date" name="end" id="diff-end" value="{{ end }}"/>
     <button type="submit">Submit</button>
 </form>
 {% if diff %}
-    {% set diff_old_date = diff['old_date'].strftime('%Y-%m-%d') %}
-    {% set diff_new_date = diff['new_date'].strftime('%Y-%m-%d') %}
-    {% if diff_old_date != start or diff_new_date != end %}
-        Unable to find exact match, display changes from {{ diff_old_date }} to {{ diff_new_date }}.
-    {% endif %}
     <h2>Added</h2>
     <ul>
-        {% for add in diff['added'] %}
-            <li>{{ add['beverage'] }}</li>
+        {% for beverage in added %}
+            <li>{{ beverage['name'] }}</li>
         {% endfor %}
     </ul>
     <h2>Removed</h2>
     <ul>
-        {% for removed in diff['remove'] %}
-            <li>{{ removed['beverage'] }}</li>
+        {% for beverage in removed %}
+            <li>{{ beverage['name'] }}</li>
         {% endfor %}
     </ul>
 {% endif %}
+<script type="text/javascript">
+    FilteredSelect.init($('#diff-chain'), $('#diff-location'), {{ chain_opts|tojson|safe }}, {{ location|tojson|safe }});
+</script>
 </body>
 </html>

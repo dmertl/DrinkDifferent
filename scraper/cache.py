@@ -76,9 +76,9 @@ def get_cache_extreme(chain, location, extreme='new'):
     """
     chain = _safe_name(chain)
     location = _safe_name(location)
-    year = min(os.listdir(cache_root))
+    year = min([x for x in os.listdir(cache_root) if os.path.isdir(os.path.join(cache_root, x))])
     year_dir = os.path.join(cache_root, year)
-    month = min(os.listdir(year_dir))
+    month = min([x for x in os.listdir(year_dir) if os.path.isdir(os.path.join(year_dir, x))])
     month_dir = os.path.join(year_dir, month)
     regex = re.compile('.*[0-9]{4}-[0-9]{2}-([0-9]{2})_' + chain + '_' + location + '.json')
     days = []

@@ -7,6 +7,8 @@ TODO
 ----
 
 - Get details back into stout scraping
+- Update web to handle new menu format
+- Add BAC to web
 - Better scraping for edge cases in BAC
 - Remove wine from stout
 - Cleanup stout
