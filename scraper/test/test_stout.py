@@ -40,6 +40,14 @@ class TestBeerParser(unittest.TestCase):
         self.assertEqual('Helles Lager', actual.style)
         self.assertEqual(5.1, actual.abv)
 
+    def test_volume_switches_availability(self):
+        """ Test that volume switches between On Tap and Bottle availability. """
+        parser = BeerParser()
+        actual = parser.parse('Saison Dupont Cuvee Dry Hop - Dupont / Belg / Saison / 5.2%')
+        self.assertEqual('On Tap', actual.availability)
+        actual = parser.parse('Saison Dupont Cuvee Dry Hop - Dupont / Belg / Saison / 22oz')
+        self.assertEqual('Bottle', actual.availability)
+
     def test_string_unidecoded(self):
         parser = BeerParser()
         actual = parser.parse(u'Saison Dupont Cuvee Dry Hop \u2013 Dupont / Belg / Saison / 6.5% / $10')
