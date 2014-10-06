@@ -1,6 +1,26 @@
 import unittest
-from scraper.stout import BeerParser
+import urllib2
+import os
+import json
+from scraper.stout import BeerParser, Scraper
 from scraper.model import Beverage
+from scraper.util import flatten_beverages
+
+#TODO: mock logging
+import logging
+root_log = logging.getLogger()
+root_log.setLevel(logging.WARN)
+root_log.addHandler(logging.NullHandler())
+
+
+class TestMenuParsing(unittest.TestCase):
+    def test_parse(self):
+        html = urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath('fixtures/stout_menu/hollywood_2014-08-25.html')))).read()
+        scraper = Scraper()
+        actual = flatten_beverages(scraper.scrape(html))
+        expected = urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath('fixtures/stout_menu/hollywood_2014-08-25.json')))).read()
+        expected = json.loads(expected).get('beverages')
+        self.assertEqual(expected, actual)
 
 
 class TestBeerParser(unittest.TestCase):

@@ -72,8 +72,8 @@ def parse_sections(html):
         # Header does not contain section, but they should match up sequentially
         for header_element, section_element in zip(menu_headers, menu_sections):
             section_count += 1
-            section = _parse_section(header_element, section_element, section_count)
             try:
+                section = _parse_section(header_element, section_element, section_count)
                 beverages += section['beverages']
                 # parsed_sections.append(section)
             except ParsingException as e:
@@ -102,27 +102,30 @@ def _parse_section(header_element, section_element, section_count):
     name = header_element.xpath('.//h2')
     if name:
         name = name[0].text_content().strip()
-        _log('Parsing section {0} "{1}".'.format(section_count, name))
-        section = {
-            'name': name,
-            'type': 'wine' if 'Wine' in name else 'beer',
-            'beverages': []
-        }
+        if not 'Wine' in name:
+            _log('Parsing section {0} "{1}".'.format(section_count, name))
+            section = {
+                'name': name,
+                'type': 'wine' if 'Wine' in name else 'beer',
+                'beverages': []
+            }
 
-        # Find all article elements inside the section
-        beverage_elements = section_element.xpath('.//article')
-        _log('Found {0} beverages.'.format(len(beverage_elements)))
-        beverage_count = 0
-        for beverage_element in beverage_elements:
-            beverage_count += 1
-            try:
-                beverage = _parse_beverage(beverage_element, section['type'] == 'wine', beverage_count, section_count)
-                _log('Parsed beverage {0} "{1}".'.format(beverage_count, beverage.name))
-                # _log('Parsed beverage {0} "{1}".'.format(beverage_count, beverage['name']))
-                section['beverages'].append(beverage)
-            except ParsingException as e:
-                _log(str(e), logging.DEBUG)
-        return section
+            # Find all article elements inside the section
+            beverage_elements = section_element.xpath('.//article')
+            _log('Found {0} beverages.'.format(len(beverage_elements)))
+            beverage_count = 0
+            for beverage_element in beverage_elements:
+                beverage_count += 1
+                try:
+                    beverage = _parse_beverage(beverage_element, section['type'] == 'wine', beverage_count, section_count)
+                    _log('Parsed beverage {0} "{1}".'.format(beverage_count, beverage.name))
+                    # _log('Parsed beverage {0} "{1}".'.format(beverage_count, beverage['name']))
+                    section['beverages'].append(beverage)
+                except ParsingException as e:
+                    _log(str(e), logging.DEBUG)
+            return section
+        else:
+            raise ParsingException('Skipping wine section')
     else:
         raise ParsingException('Unable to find "h2" in header {0}'.format(section_count))
 
