@@ -5,9 +5,8 @@ import json
 from scraper.stout import BeerParser, Scraper
 from scraper.model import Beverage
 from scraper.util import flatten_beverages
-
-#TODO: mock logging
 import logging
+
 root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
 root_log.addHandler(logging.NullHandler())
