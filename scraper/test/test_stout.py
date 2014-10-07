@@ -1,5 +1,4 @@
 import unittest
-import urllib2
 import os
 import json
 from scraper.stout import BeerParser, Scraper
@@ -15,14 +14,15 @@ root_log.addHandler(logging.NullHandler())
 class TestMenuParsing(unittest.TestCase):
     def test_parse(self):
         """ Test full menu parse """
-        html = urllib2.urlopen(
-            'file:{0}'.format(urllib2.quote(os.path.abspath('fixtures/stout_menu/hollywood_2014-08-25.html')))).read()
+        html_fixture = os.path.join('fixtures', 'stout_menu', 'hollywood_2014-08-25.html')
+        with file(html_fixture) as f:
+            html = f.read()
         scraper = Scraper()
-        actual = flatten_beverages(scraper.scrape(html))
-        expected = urllib2.urlopen(
-            'file:{0}'.format(urllib2.quote(os.path.abspath('fixtures/stout_menu/hollywood_2014-08-25.json')))).read()
-        expected = json.loads(expected).get('beverages')
-        self.assertEqual(expected, actual)
+        actual = scraper.scrape(html)
+        expected_fixture = os.path.join('fixtures', 'stout_menu', 'hollywood_2014-08-25.json')
+        with file(expected_fixture) as f:
+            expected = json.load(f)
+        self.assertEqual(expected.get('beverages'), flatten_beverages(actual))
 
 
 class TestBeerParser(unittest.TestCase):
