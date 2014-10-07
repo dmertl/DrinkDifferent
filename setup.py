@@ -6,5 +6,6 @@ setup(name='DrinkDifferent',
           'lxml',
           'unidecode',
           'Flask',
-          'beautifulsoup4'
+          'beautifulsoup4',
+          'Flask-SQLAlchemy',
       ])
