@@ -1,10 +1,8 @@
 import unittest
-import urllib2
 import os
 import json
 from scraper.ball_and_chain import Scraper
-from scraper.model import Beverage
-from scraper.util import flatten_beverages, flatten_menu_scrape
+from scraper.util import flatten_beverages
 import logging
 
 root_log = logging.getLogger()
