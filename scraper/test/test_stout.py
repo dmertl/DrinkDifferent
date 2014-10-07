@@ -77,5 +77,5 @@ class TestBeerParser(unittest.TestCase):
         self.assertEqual('Dupont', actual.brewery)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

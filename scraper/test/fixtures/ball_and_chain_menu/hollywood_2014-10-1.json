@@ -1,0 +1,893 @@
+{"url": "http://www.ball-and-chain-restaurant.com/", "date": "2014-10-06T22:29:04.253754", "beverages": [
+    {
+        "brewery": "Belching Beaver",
+        "location": "Vista",
+        "type": "Beer",
+        "name": "Beaver's Milk",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Cochella Valley",
+        "location": "Thousand Palms",
+        "type": "Beer",
+        "name": "Kolschella Kolsch",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Drake's",
+        "location": "San Leandro",
+        "type": "Beer",
+        "name": "Blonde",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Bootlegger's",
+        "location": "Fullerton",
+        "type": "Beer",
+        "name": "Old World Hefeweizen",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Golden Road",
+        "location": "Los Angeles",
+        "type": "Beer",
+        "name": "Hefeweizen",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Strand",
+        "location": "Torrance",
+        "type": "Beer",
+        "name": "Atticus IPA",
+        "availability": "On Tap"
+    },
+    {
+        "location": "San Francisco",
+        "type": "Beer",
+        "name": "Anchor Steam",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Cismontane",
+        "location": "Rancho Santa Margarita",
+        "type": "Beer",
+        "name": "Holy Jim Falls XPA",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Left Coast",
+        "location": "San Clemente",
+        "type": "Beer",
+        "name": "Trestles",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Stone",
+        "location": "Escondido",
+        "type": "Beer",
+        "name": "Go To IPA",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Bear Republic",
+        "location": "Healdsburg",
+        "type": "Beer",
+        "name": "Racer 5",
+        "availability": "On Tap"
+    },
+    {
+        "location": "Fort Bragg",
+        "type": "Beer",
+        "name": "Acme IPA",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Figueroa Mountain",
+        "type": "Beer",
+        "name": "Hoppy Poppy",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Venice Beach Breweing",
+        "location": "Venice",
+        "type": "Beer",
+        "name": "June Gloom",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Eagle Rock",
+        "location": "Los Angeles",
+        "type": "Beer",
+        "name": "Unionist",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Mendocino Brewing Co.",
+        "location": "Mendocino",
+        "type": "Beer",
+        "name": "Red Tail Ale",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Green Flash",
+        "location": "San Diego",
+        "type": "Beer",
+        "name": "Hop Head Red",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Alesmith",
+        "location": "San Diego",
+        "type": "Beer",
+        "name": "Anvil ESB",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Bayhawk",
+        "location": "Irvine",
+        "type": "Beer",
+        "name": "Chocolate Porter",
+        "availability": "On Tap"
+    },
+    {
+        "brewery": "Anderson Valley",
+        "location": "Boonville",
+        "type": "Beer",
+        "name": "Barney Flats Oatmeal Stout",
+        "availability": "On Tap"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Amstel",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Asahi",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Bitburger Drive N/A",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Bitburger Premium",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Bud",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Bud Light",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Cismontane Citizen Cali Lager",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Coors light",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Corona",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Figueroa Mountain Danish Red",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Grolsch",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Harp",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Heineken",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Kaliber N/A",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "MGD",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Miller Highlife",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Miller Light",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Morretti",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Omission Lager (G)",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Pacifico",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Peroni",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Pilsner Urquell",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Rolling Rock",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Sam Addams",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Sappuro",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Spaten",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "St. Pauli N/A",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Steigle Golden Premium",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Stella",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Victory Prima Pils",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Allagash White",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Blanche de Bruxells",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Blue Moon",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Franziskaner Hefe-Weissbier",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Hitachino White",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Hoe Gaarden",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Schnieder Weisse Adventinus",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Sierra Nevada Kellerweisse",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Unibroue Blanche De Chamblis",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Weihienstephaner",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Abita Amber",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Bass Pale Ale",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Boddington's Pub Ale",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Cismontane Holy Jim Falls XPA",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Deshuttes Mirror Pond Pale Ale",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Figueroa Mountain Pale Ale",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Fuller's ESB",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "New Belgium Fat Tire",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Omission Pale Ale (G)",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Sam Smith Pale",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Sierra Nevada Pale Ale",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Smithwick's Irish Red",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Anchor Liberty Ale",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Cismontane Coulter IPA",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Dogfish Head 60 Minute",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Dogfish Head 90 Minute",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Figueroa Mountain Hoppy Poppy IPA",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Figueroa Mountain Hurricane Deck DIPA",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Lagunitas Daytime IPA",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "New Belgium Ranger IPA",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Omission IPA",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Sierra Nevada Torpedo",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Stone IPA",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Stone Ruination",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Ayenger Celebrator",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Figueroa Mountain Davey Brown",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Lagunitas Brown Shugga",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "New Castle Brown",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Rogue Dead Guy Ale",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Rogue Hazel Nut Brown",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Sam Smith Nut Brown",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Chimay Blue",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Chimay Red",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Chimay White",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Delerium Tremens",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Duvel",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "La Trappe / Koningshoeven",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Leffe Blonde",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Leffe Bruin",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "North Coast Pranqster",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Ommegang Hennepin Saison",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Orval",
+        "availability": "Bottle"
+    },
+    {
+        "price": 11.0,
+        "type": "Beer",
+        "name": "Rochefort 10",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Rochefort 6",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Rochefort 8",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Tripel Karmeliet",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Unibroue La Fin Du Monde",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Unibroue Maudite",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Unibroue Trois Pistoles",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Victory Golden Monkey",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Westmalle Dubbel",
+        "availability": "Bottle"
+    },
+    {
+        "price": 11.0,
+        "type": "Beer",
+        "name": "Westmalle Tripel",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Anchor Porter",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Cismontane Blacks Dawn Imperial Stout",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Deshuttes Black Butte Porter",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Deshuttes Obsidian Stout",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Figueroa Mountain Stage Coach Stout",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Guinness",
+        "availability": "Bottle"
+    },
+    {
+        "price": 11.0,
+        "type": "Beer",
+        "name": "Hitachino Espresso Stout",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "North Coast Old Rasputin",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Rogue Mocha Porter",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Sam Smith Oatmeal Stout",
+        "availability": "Bottle"
+    },
+    {
+        "price": 8.0,
+        "type": "Beer",
+        "name": "Sam Smith Toddy Porter",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Sierra Nevada Stout",
+        "availability": "Bottle"
+    },
+    {
+        "price": 7.0,
+        "type": "Beer",
+        "name": "Young's Double Chocolate Stout",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Abita Purple Haze",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Leinenkugel Shandy",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Lindeman's Framboise",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Lindeman's Kreik",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Lindeman's Peche",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Lindeman's Pomme",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Redd's Apple",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Sam Smith Rasberry",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Sam Smith Strawberry",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Steigle Radler Grapefruit",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Unibroue Ephemere Cerise",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Unibroue Ephemere Pomme",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Angry Orchard Dry Apple",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Crispin Original",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Square Mile Apple-Pear Cider",
+        "availability": "Bottle"
+    },
+    {
+        "price": 6.0,
+        "type": "Beer",
+        "name": "Stella Cidre",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Duchesse De Bourgogne",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Jacobins Cuvee Rouge",
+        "availability": "Bottle"
+    },
+    {
+        "price": 9.0,
+        "type": "Beer",
+        "name": "Leifman's Oud Bruin",
+        "availability": "Bottle"
+    },
+    {
+        "price": 10.0,
+        "type": "Beer",
+        "name": "Monk's Cafe",
+        "availability": "Bottle"
+    }
+], "location": {
+    "url": "http://www.ball-and-chain-restaurant.com/",
+    "name": "Hollywood",
+    "chain": "Ball and Chain"
+}, "version": "2.0.0"}
