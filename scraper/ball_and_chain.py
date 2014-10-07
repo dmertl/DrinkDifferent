@@ -4,6 +4,7 @@ import sys
 import urllib2
 import json
 import base
+import re
 from bs4 import BeautifulSoup
 from model import Beverage, Location
 from scraper.util import flatten_beverages, url_from_arg
@@ -90,17 +91,18 @@ class Scraper(base.Scraper):
                 # Screw everything except beer
                 if current_type != 'Beer':
                     continue
-                # Format is a CSV of "beer $cost, beer $cost"
-                # TODO: May be better to use regex to separate based on [^,$]+ $[0-9]+ should catch ones with missing commas
-                # TODO: May also be able to catch extras commas, $ is consistent commas are not
-                bevs = element.string.split(',')
+                # Format is a CSV of "beer $cost, beer $cost" but sometimes they mess up their commas
+                bevs = re.findall('([^,$]+),?\s*\$+([0-9.]+)', element.string)
                 for bev in bevs:
-                    pieces = bev.strip().split(' $')
-                    if len(pieces) == 2:
-                        name = pieces[0]
+                    if len(bev) == 2:
+                        name = bev[0].strip()
                         if type(name) is unicode:
                             name = unidecode(name)
-                        price = float(pieces[1].replace('$', ''))
+                        try:
+                            price = float(bev[1])
+                        except ValueError:
+                            root_log.warn('Unable to convert price into float. price={}'.format(bev[1]))
+                            price = None
                         beverage = Beverage()
                         beverage.name = name
                         beverage.price = price
@@ -108,7 +110,6 @@ class Scraper(base.Scraper):
                         beverage.availability = 'Bottle'
                         beverages.append(beverage)
                     else:
-                        # Usually this happens because they forget a comma
                         root_log.warn('Unable to parse name and cost from bottled beverage. string={0}'.format(bev))
 
         return beverages
