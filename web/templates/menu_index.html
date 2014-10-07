@@ -5,6 +5,8 @@
     <title></title>
 </head>
 <body>
-Menu index coming soon
+{% for location in locations %}
+    {{ location.name }}
+{% endfor %}
 </body>
 </html>

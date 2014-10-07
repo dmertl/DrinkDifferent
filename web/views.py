@@ -1,11 +1,12 @@
 from scraper.util import expand_menu_scrape
-from web import app
+from web import app, db
 from scraper.cache import get_cache, get_cache_near, get_cache_extreme
 from flask import render_template, request
 from datetime import datetime, timedelta
 import dateutil.parser
 from menu_diff import diff_beverages
 from scraper import stout, ball_and_chain
+from models import Location, Chain
 
 
 @app.route('/')
@@ -13,9 +14,23 @@ def home():
     return render_template('home.html')
 
 
+@app.route('/locations/')
+def location_index():
+    context = {
+        'chains': Chain.query.all()
+    }
+    return render_template('location_index.html', **context)
+
+
+@app.route('/location/<id>')
+def location(id):
+    location = Location.query.get(id)
+    return render_template('location_view.html', location=location)
+
+
 @app.route('/menu/')
 def menu_index():
-    # TODO: List all menus, click to view
+    # TODO: List all menu scrapes, click to view
     return render_template('menu_index.html')
 
 
@@ -54,12 +69,12 @@ def menu_diff():
             end = datetime.now().strftime('%Y-%m-%d')
 
     context.update({
-        'chain': chain,
-        'location': location,
-        'start': start,
-        'end': end,
-        'chain_opts': get_chain_dict()
-    }.items())
+                       'chain': chain,
+                       'location': location,
+                       'start': start,
+                       'end': end,
+                       'chain_opts': get_chain_dict()
+                   }.items())
 
     return render_template('diff.html', **context)
 
