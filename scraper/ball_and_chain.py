@@ -105,6 +105,7 @@ class Scraper(base.Scraper):
                         beverage.name = name
                         beverage.price = price
                         beverage.type = current_type
+                        beverage.availability = 'Bottle'
                         beverages.append(beverage)
                     else:
                         # Usually this happens because they forget a comma
