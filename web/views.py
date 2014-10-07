@@ -16,7 +16,7 @@ def home():
 @app.route('/menu/')
 def menu_index():
     # TODO: List all menus, click to view
-    return 'Menu index'
+    return render_template('menu_index.html')
 
 
 @app.route('/menu/<menu_name>/')
@@ -44,7 +44,8 @@ def menu_diff():
             new_menu = get_cache_extreme(chain, location, 'new')
         context['old_menu'] = expand_menu_scrape(old_menu)
         context['new_menu'] = expand_menu_scrape(new_menu)
-        context['added'], context['removed'] = diff_beverages(context['old_menu'].beverages, context['new_menu'].beverages)
+        context['added'], context['removed'] = \
+            diff_beverages(context['old_menu'].beverages, context['new_menu'].beverages)
     else:
         # Form defaults
         if not start:

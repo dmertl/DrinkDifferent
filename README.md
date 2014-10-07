@@ -6,11 +6,9 @@ Find new beers to drink.
 TODO
 ----
 
-- Get details back into stout scraping
-- Update web to handle new menu format
-- Add BAC to web
-- Better scraping for edge cases in BAC
-- Remove wine from stout
+- Menu index page
+- Move everything to a database (sqlite)
+- Update menu view page to handle new menu format
 - Cleanup stout
 
 Scrapers
