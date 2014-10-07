@@ -14,10 +14,13 @@ root_log.addHandler(logging.NullHandler())
 
 class TestMenuParsing(unittest.TestCase):
     def test_parse(self):
-        html = urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath('fixtures/stout_menu/hollywood_2014-08-25.html')))).read()
+        """ Test full menu parse """
+        html = urllib2.urlopen(
+            'file:{0}'.format(urllib2.quote(os.path.abspath('fixtures/stout_menu/hollywood_2014-08-25.html')))).read()
         scraper = Scraper()
         actual = flatten_beverages(scraper.scrape(html))
-        expected = urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath('fixtures/stout_menu/hollywood_2014-08-25.json')))).read()
+        expected = urllib2.urlopen(
+            'file:{0}'.format(urllib2.quote(os.path.abspath('fixtures/stout_menu/hollywood_2014-08-25.json')))).read()
         expected = json.loads(expected).get('beverages')
         self.assertEqual(expected, actual)
 
@@ -72,6 +75,7 @@ class TestBeerParser(unittest.TestCase):
         actual = parser.parse(u'Saison Dupont Cuvee Dry Hop \u2013 Dupont / Belg / Saison / 6.5% / $10')
         self.assertEqual('Saison Dupont Cuvee Dry Hop', actual.name)
         self.assertEqual('Dupont', actual.brewery)
+
 
 if __name__ == "__main__":
     unittest.main()

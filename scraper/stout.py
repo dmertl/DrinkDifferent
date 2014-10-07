@@ -74,8 +74,8 @@ def parse_sections(html):
             section_count += 1
             try:
                 section = _parse_section(header_element, section_element, section_count)
-                beverages += section['beverages']
-                # parsed_sections.append(section)
+                if section:
+                    beverages += section['beverages']
             except ParsingException as e:
                 _log(str(e), logging.WARN)
     else:
@@ -125,7 +125,7 @@ def _parse_section(header_element, section_element, section_count):
                     _log(str(e), logging.DEBUG)
             return section
         else:
-            raise ParsingException('Skipping wine section')
+            return None
     else:
         raise ParsingException('Unable to find "h2" in header {0}'.format(section_count))
 
