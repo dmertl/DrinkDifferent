@@ -9,14 +9,13 @@ from abc import abstractmethod
 from lxml.html import fromstring
 from unidecode import unidecode
 from web.models import Location, Beverage, Chain
-from scraper.util import url_from_arg, flatten_beverages
+from scraper.util import url_from_arg
 import base
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
 
 chain = Chain.query.filter_by(name='Stout').first()
-# locations = Chain.locations
 locations = Location.query.filter_by(chain=chain)
 
 # TODO: Move old code into Scraper

@@ -6,16 +6,16 @@ import json
 import base
 import re
 from bs4 import BeautifulSoup
-from scraper.util import flatten_beverages, url_from_arg
+from scraper.util import url_from_arg
 from unidecode import unidecode
-from web.models import Chain, Beverage
+from web.models import Chain, Beverage, Location
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
 
 # Ball and Chain locations
 chain = Chain.query.filter_by(name='Ball and Chain').first()
-locations = chain.locations
+locations = Location.query.filter_by(chain=chain)
 
 
 class Scraper(base.Scraper):
@@ -65,7 +65,7 @@ class Scraper(base.Scraper):
                 beverage.brewery = brewery
             elif element.name == 'h3':
                 # h3 is Location
-                beverage.location = element.string.strip()
+                beverage.brewery_location = element.string.strip()
         if beverage:
             beverages.append(beverage)
         return beverages
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     url = url_from_arg(args.url, locations)
     contents = urllib2.urlopen(url).read()
     beverages = scraper.scrape(contents)
-    beverages_flat = flatten_beverages(beverages)
+    beverages_flat = [x.flatten() for x in beverages]
 
     # Output beverage data as JSON
     if args.pretty:

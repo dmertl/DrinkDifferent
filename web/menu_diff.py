@@ -4,7 +4,6 @@ import json
 import logging
 import urllib2
 import sys
-from scraper.util import expand_menu_scrape, flatten_beverages
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
