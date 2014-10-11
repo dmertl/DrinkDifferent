@@ -328,7 +328,7 @@ class LocationStyleExtractor(Extractor):
         if search and len(search.groups()) == 3:
             return {
                 '__value': value.replace(search.group(1), ''),
-                'location': search.group(2).strip(),
+                'brewery_location': search.group(2).strip(),
                 'style': search.group(3).strip()
             }
         raise ExtractionException('Unable to extract location or style. value={}'.format(value))
