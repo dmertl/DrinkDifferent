@@ -21,8 +21,15 @@ class TestScraper(unittest.TestCase):
         expected_fixture = os.path.join('fixtures', 'ball_and_chain_menu', 'hollywood_2014-10-1.json')
         with file(expected_fixture) as f:
             expected = json.load(f)
-        self.assertEqual(expected.get('beverages'), flatten_beverages(actual))
-        pass
+        self.assertEqual(len(expected), len(actual),
+                         'Beverage length does not match. expected={}, actual={}'.format(len(expected),
+                                                                                         len(actual)))
+        for i in range(0, len(expected)):
+            actual_flat = actual[i].flatten()
+            # Ignore timestamps
+            del expected[i]['created']
+            del actual_flat['created']
+            self.assertEqual(expected[i], actual_flat)
 
 
 if __name__ == '__main__':
