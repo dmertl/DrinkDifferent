@@ -30,6 +30,7 @@ def scrape_location(location, scraper):
         menu_scrape.beverages = scraper.scrape(menu_html)
         db.session.add(menu_scrape)
         for beverage in menu_scrape.beverages:
+            beverage.menu_scrape = menu_scrape
             db.session.add(beverage)
         db.session.commit()
     else:

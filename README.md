@@ -3,6 +3,14 @@ DrinkDifferent
 
 Find new beers to drink.
 
+Setup
+-----
+
+Create database with model schema.
+    scripts/create_schema.py
+Populate database with scrapable locations.
+    scripts/db_init_locations.py
+
 TODO
 ----
 
@@ -11,6 +19,7 @@ TODO
 - Menu index page
 - Update menu view page to handle new menu format
 - Cleanup stout
+- Config
 
 Scrapers
 --------
