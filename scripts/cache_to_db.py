@@ -108,7 +108,7 @@ if __name__ == '__main__':
     # Command line arguments
     parser = argparse.ArgumentParser(description='Move cache files to database.')
 
-    root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'menu_cache')
+    root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'scraper', 'menu_cache')
     root_log.debug('Upgrading root dir {}'.format(root_dir))
     for year in os.listdir(root_dir):
         year_dir = os.path.join(root_dir, year)
@@ -128,4 +128,4 @@ if __name__ == '__main__':
                 with file(file_path) as f:
                     json_data = json.load(f)
                 menu_scrape = to_database(json_data, filename)
-                root_log.info('Added cache file {} to the database. MenuScrape.id='.format(file_path, menu_scrape.id))
+                root_log.info('Added cache file {} to the database.'.format(file_path))
