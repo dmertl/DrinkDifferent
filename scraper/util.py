@@ -1,7 +1,7 @@
 import os
 import urllib2
 import dateutil.parser
-from scraper.model import MenuScrape, Location, Beverage
+from web.models import MenuScrape, Location, Beverage
 
 
 def flatten_beverages(beverages):
@@ -14,9 +14,10 @@ def flatten_beverages(beverages):
     :rtype: dict[]
     """
     flat = []
+    blacklist = ['location', 'location_id', 'menu_scrapes']
     for beverage in beverages:
         flat.append(
-            dict((k, v) for k, v in beverage.__dict__.iteritems() if v)
+            dict((k, v) for k, v in beverage.__dict__.iteritems() if v and not k in blacklist)
         )
     return flat
 
@@ -24,6 +25,7 @@ def flatten_beverages(beverages):
 def expand_beverages(data):
     """
     Expand flattened beverage list back into Beverage list.
+    TODO: remove
 
     :param data: Flat beverage list.
     :type data: dict[]
@@ -52,15 +54,15 @@ def flatten_menu_scrape(menu_scrape):
     return {
         'location': flatten_location(menu_scrape.location),
         'url': menu_scrape.url,
-        'date': menu_scrape.date.isoformat() if menu_scrape.date else None,
-        'beverages': flatten_beverages(menu_scrape.beverages),
-        'version': menu_scrape.version
+        'date': menu_scrape.created.isoformat() if menu_scrape.created else None,
+        'beverages': flatten_beverages(menu_scrape.beverages)
     }
 
 
 def expand_menu_scrape(data):
     """
     Expand a flattened menu scrape dict back into a MenuScrape.
+    TODO: remove
 
     :param data: Menu scrape dict.
     :type data: dict
@@ -87,12 +89,24 @@ def flatten_location(location):
     :return: Dict.
     :rtype: dict
     """
-    return location.__dict__.copy()
+    return {
+        'id': location.id,
+        'name': location.name,
+        'url': location.url,
+        'untappd_id': location.untappd_id,
+        'created': location.created.isoformat(),
+        'chain': {
+            'id': location.id,
+            'name': location.chain.name,
+            'created': location.chain.created.isoformat()
+        }
+    }
 
 
 def expand_location(data):
     """
     Expand flattened location dict back into a Location.
+    TODO: remove
 
     :param data: Location dict.
     :type data: dict

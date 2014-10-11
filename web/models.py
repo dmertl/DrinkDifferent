@@ -45,24 +45,28 @@ class Beverage(db.Model):
 
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
 
-    def __init__(self, name=None, brewery=None, type=None, created=None):
+    def __init__(self, name=None, brewery=None, type='Beer', style=None, abv=None, year=None, description=None,
+                 availability=None, price=None, volume=None, volume_units=None, untappd_id=None,
+                 untappd_brewery_id=None, scraped_value=None, created=None, is_active=True):
         self.name = name
         self.brewery = brewery
         self.type = type
+        self.style = style
+        self.abv = abv
+        self.year = year
+        self.description = description
+        self.availability = availability
+        self.price = price
+        self.volume = volume
+        self.volume_units = volume_units
+        self.untappd_id = untappd_id
+        self.untappd_brewery_id = untappd_brewery_id
+        self.scraped_value = scraped_value
         self.created = created or datetime.now()
+        self.is_active = is_active
 
     def __repr__(self):
         return '<Beverage {}>'.format(self.name)
-
-        # def __eq__(self, other):
-        # if self.untappd_id and other.untappd_id:
-        #             return self.untappd_id == other.untappd_id
-        #         else:
-        #             return self.name == other.name
-        #
-        #     def __hash__(self):
-        #         # TODO: This isn't really unique and may be problematic, but it makes intersection() work
-        #         return hash(str(self.untappd_id) + str(self.name))
 
 
 class Location(db.Model):
@@ -78,10 +82,11 @@ class Location(db.Model):
 
     menu_scrapes = db.relationship('MenuScrape', backref='location')
 
-    def __init__(self, name=None, url=None, chain=None, created=None):
+    def __init__(self, name=None, url=None, chain=None, untappd_id=None, created=None):
         self.name = name
         self.url = url
         self.chain = chain
+        self.untappd_id = untappd_id
         self.created = created or datetime.now()
 
     def __repr__(self):

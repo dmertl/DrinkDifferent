@@ -6,17 +6,16 @@ import json
 import base
 import re
 from bs4 import BeautifulSoup
-from model import Beverage, Location
 from scraper.util import flatten_beverages, url_from_arg
 from unidecode import unidecode
+from web.models import Chain, Beverage
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
 
 # Ball and Chain locations
-locations = [
-    Location('Hollywood', 'http://www.ball-and-chain-restaurant.com/', 'Ball and Chain')
-]
+chain = Chain.query.filter_by(name='Ball and Chain').first()
+locations = chain.locations
 
 
 class Scraper(base.Scraper):
@@ -50,9 +49,7 @@ class Scraper(base.Scraper):
                 # h2 is Brewery - Name
                 if beverage:
                     beverages.append(beverage)
-                beverage = Beverage()
-                beverage.type = 'Beer'
-                beverage.availability = 'On Tap'
+                beverage = Beverage(type='Beer', availability='On Tap', is_active=True)
                 pieces = element.text.split('-')
                 if len(pieces) == 2:
                     brewery = pieces[0].strip()
@@ -103,11 +100,8 @@ class Scraper(base.Scraper):
                         except ValueError:
                             root_log.warn('Unable to convert price into float. price={}'.format(bev[1]))
                             price = None
-                        beverage = Beverage()
-                        beverage.name = name
-                        beverage.price = price
-                        beverage.type = current_type
-                        beverage.availability = 'Bottle'
+                        beverage = Beverage(name=name, price=price, type=current_type, availability='Bottle',
+                                            is_active=True)
                         beverages.append(beverage)
                     else:
                         root_log.warn('Unable to parse name and cost from bottled beverage. string={0}'.format(bev))
