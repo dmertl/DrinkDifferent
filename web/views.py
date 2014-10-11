@@ -17,7 +17,7 @@ def home():
 @app.route('/locations/')
 def location_index():
     context = {
-        'chains': Chain.query.all()
+        'locations': Location.query.all()
     }
     return render_template('location_index.html', **context)
 

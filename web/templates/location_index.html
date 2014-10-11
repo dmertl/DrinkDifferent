@@ -5,15 +5,12 @@
     <title></title>
 </head>
 <body>
-{% for chain in chains %}
-    <h2>{{ chain.name }}</h2>
-    <ul>
-        {% for location in chain.locations %}
-            <li>
-                <a href="{{ url_for('location', id=location.id) }}">{{ location.name }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-{% endfor %}
+<ul>
+    {% for location in locations %}
+        <li>
+            <a href="{{ url_for('location', id=location.id) }}">{{ location.chain.name }} - {{ location.name }}</a>
+        </li>
+    {% endfor %}
+</ul>
 </body>
 </html>
