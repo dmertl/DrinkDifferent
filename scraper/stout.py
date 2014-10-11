@@ -16,7 +16,8 @@ root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
 
 chain = Chain.query.filter_by(name='Stout').first()
-locations = Chain.locations
+# locations = Chain.locations
+locations = Location.query.filter_by(chain=chain)
 
 # TODO: Move old code into Scraper
 class Scraper(base.Scraper):
@@ -355,7 +356,7 @@ if __name__ == '__main__':
     url = url_from_arg(args.filename, locations)
     contents = urllib2.urlopen(url).read()
     beverages = parse_menu(contents)
-    beverages_flat = flatten_beverages(beverages)
+    beverages_flat = [x.flatten() for x in beverages]
 
     # Output beverage data as JSON
     if args.pretty:
