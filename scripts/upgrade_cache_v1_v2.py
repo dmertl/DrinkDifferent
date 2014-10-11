@@ -1,5 +1,6 @@
 """
-Upgrades v1 cache files to v2.
+Upgrades v1 cache files to v2. v1 is the original cache file format, v2 was implemented on 10/5. Menu cache is now
+entirely gone, everything is in the database.
 
 File naming change:
 - Remove "menu_"

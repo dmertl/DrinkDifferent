@@ -1,5 +1,5 @@
 """
-Moves old menu cache files to sqlite database.
+Moves old v2 menu cache files to sqlite database.
 
 Each cache file becomes a MenuScrape. Each beverage becomes a Beverage.
 """
