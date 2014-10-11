@@ -1,22 +1,19 @@
 from web import db
 from datetime import datetime
 
-menu_scrape_beverage_table = db.Table('menu_scrape_beverage', db.metadata,
-                                      db.Column('menu_scrape_id', db.Integer, db.ForeignKey('menu_scrape.id')),
-                                      db.Column('beverage_id', db.Integer, db.ForeignKey('beverage.id')))
-
 
 class MenuScrape(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(128))
     created = db.Column(db.DateTime)
 
-    beverages = db.relationship('Beverage', secondary=menu_scrape_beverage_table, backref='menu_scrapes')
+    beverages = db.relationship('Beverage', backref='menu_scrape')
 
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
 
     def __init__(self, location=None, url=None, beverages=None, created=None):
-        self.location = location
+        if location:
+            self.location = location
         self.url = url
         if beverages:
             self.beverages = beverages
@@ -54,6 +51,8 @@ class Beverage(db.Model):
 
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
 
+    menu_scrape_id = db.Column(db.Integer, db.ForeignKey('menu_scrape.id'))
+
     def __init__(self, name=None, brewery=None, type='Beer', style=None, abv=None, year=None, description=None,
                  availability=None, price=None, volume=None, volume_units=None, untappd_id=None,
                  untappd_brewery_id=None, scraped_value=None, created=None, is_active=True):
@@ -78,7 +77,7 @@ class Beverage(db.Model):
         return '<Beverage {}>'.format(self.name)
 
     def flatten(self):
-        blacklist = ['created', 'location_id', 'location', 'menu_scrapes']
+        blacklist = ['created', 'location_id', 'location', 'menu_scrape', 'menu_scrape_id']
         d = dict((k, v) for k, v in self.__dict__.iteritems() if v and not k in blacklist)
         d['created'] = self.created.isoformat()
         return d
