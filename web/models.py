@@ -10,10 +10,9 @@ class MenuScrape(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime)
 
-    beverages = db.relationship('Beverage', secondary=menu_scrape_beverage_table)
+    beverages = db.relationship('Beverage', secondary=menu_scrape_beverage_table, backref='menu_scrapes')
 
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
-    location = db.relationship('Location', backref=db.backref('menu_scrapes', lazy='dynamic'))
 
     def __init__(self, location=None, beverages=None, created=None):
         self.location = location
@@ -45,9 +44,6 @@ class Beverage(db.Model):
     is_active = db.Column(db.Boolean)
 
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
-    location = db.relationship('Location', backref=db.backref('beverages', lazy='dynamic'))
-
-    menu_scrapes = db.relationship('MenuScrape', secondary=menu_scrape_beverage_table)
 
     def __init__(self, name=None, brewery=None, type=None, created=None):
         self.name = name
@@ -77,7 +73,10 @@ class Location(db.Model):
     created = db.Column(db.DateTime)
 
     chain_id = db.Column(db.Integer, db.ForeignKey('chain.id'))
-    chain = db.relationship('Chain', backref=db.backref('locations', lazy='dynamic'))
+
+    beverages = db.relationship('Beverage', backref='location')
+
+    menu_scrapes = db.relationship('MenuScrape', backref='location')
 
     def __init__(self, name=None, url=None, chain=None, created=None):
         self.name = name
@@ -93,6 +92,8 @@ class Chain(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
     created = db.Column(db.DateTime)
+
+    locations = db.relationship('Location', backref='chain')
 
     def __init__(self, name=None, created=None):
         self.name = name
