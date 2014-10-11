@@ -8,14 +8,16 @@ menu_scrape_beverage_table = db.Table('menu_scrape_beverage', db.metadata,
 
 class MenuScrape(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String(128))
     created = db.Column(db.DateTime)
 
     beverages = db.relationship('Beverage', secondary=menu_scrape_beverage_table, backref='menu_scrapes')
 
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
 
-    def __init__(self, location=None, beverages=None, created=None):
+    def __init__(self, location=None, url=None, beverages=None, created=None):
         self.location = location
+        self.url = url
         if beverages:
             self.beverages = beverages
         self.created = created or datetime.now()
