@@ -6,8 +6,8 @@ Find new beers to drink.
 TODO
 ----
 
-- Menu index page
 - Move everything to a database (sqlite)
+- Menu index page
 - Update menu view page to handle new menu format
 - Cleanup stout
 
@@ -27,6 +27,7 @@ Scrapers
 - All scrapes should be executable scripts and python modules
 - Executing from command line should allow for scraping file or url and output JSON
 - Would be nice if scrapers simply took HTML. So far both stout and ball and chain don't need any special handling.
+- Use checkin data from untappd to get beer list? Have to deal with stale data, how far back do we go for "current" beer?
 
 Menu Diff
 ---------
