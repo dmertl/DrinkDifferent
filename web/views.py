@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import dateutil.parser
 from menu_diff import diff_beverages
 from scraper import stout, ball_and_chain
-from models import Location, Chain
+from models import Location, Chain, MenuScrape, Beverage
 
 
 @app.route('/')
@@ -22,22 +22,28 @@ def location_index():
     return render_template('location_index.html', **context)
 
 
-@app.route('/location/<id>')
+@app.route('/locations/<id>')
 def location(id):
-    location = Location.query.get(id)
-    return render_template('location_view.html', location=location)
+    context = {
+        'location': Location.query.get_or_404(id)
+    }
+    return render_template('location_view.html', **context)
 
 
-@app.route('/menu/')
+@app.route('/menus/')
 def menu_index():
-    # TODO: List all menu scrapes, click to view
-    return render_template('menu_index.html')
+    context = {
+        'menus': MenuScrape.query.all()
+    }
+    return render_template('menu_index.html', **context)
 
 
-@app.route('/menu/<menu_name>/')
-def menu_view(menu_name):
-    menu = get_cache(name=menu_name)
-    return render_template('table_view.html', menu=menu)
+@app.route('/menus/<id>')
+def menu(id):
+    context = {
+        'menu': MenuScrape.query.get_or_404(id)
+    }
+    return render_template('menu_view.html', **context)
 
 
 @app.route('/menu/diff/')

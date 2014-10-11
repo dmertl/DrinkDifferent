@@ -16,7 +16,7 @@
 
 <h2>Current Beverages</h2>
 <ul>
-    {% for beverage in location.beverage %}
+    {% for beverage in location.beverages %}
         {% if beverage.is_active %}
             <li>
                 <a href="#">{{ beverage.brewery }} - {{ beverage.name }}</a>
@@ -24,8 +24,5 @@
         {% endif %}
     {% endfor %}
 </ul>
-<pre>
-{{ location.__dict__|pprint }}
-</pre>
 </body>
 </html>

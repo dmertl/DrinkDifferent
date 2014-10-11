@@ -1,0 +1,47 @@
+{% set columns = [
+    'brewery',
+    'name',
+    'style',
+    'abv',
+    'price',
+] %}
+<html>
+<head>
+    <title>Stout Beer Notifier - Table View</title>
+    <style type="text/css">
+        table td {
+            padding: 5px;
+        }
+
+        .table-section-divider > td {
+            font-weight: bold;
+            padding: 10px 10px 10px 0;
+            border-bottom: solid 1px #333;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    Menu for {{ menu.location.chain.name }} - {{ menu.location.name }}
+    scraped on {{ menu.created.strftime('%Y-%m-%d') }}
+</h1>
+<table>
+    <thead>
+    <tr>
+        {% for column in columns %}
+            <th>{{ column|replace("_", " ")|title }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for beverage in menu.beverages %}
+        <tr>
+            {% for column in columns %}
+                <td>{{ beverage[column] }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>

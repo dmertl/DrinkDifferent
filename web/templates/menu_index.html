@@ -5,8 +5,14 @@
     <title></title>
 </head>
 <body>
-{% for location in locations %}
-    {{ location.name }}
+<ul>
+{% for menu in menus %}
+    <li>
+        <a href="{{ url_for('menu', id=menu.id) }}">
+            {{ menu.created.strftime('%Y-%m-%d') }} {{ menu.location.chain.name }} - {{ menu.location.name }}
+        </a>
+    </li>
 {% endfor %}
+</ul>
 </body>
 </html>
