@@ -2,8 +2,7 @@ import unittest
 import os
 import json
 from scraper.stout import BeerParser, Scraper
-from scraper.model import Beverage
-from scraper.util import flatten_beverages
+from web.models import Beverage
 import logging
 
 root_log = logging.getLogger()
@@ -22,7 +21,15 @@ class TestMenuParsing(unittest.TestCase):
         expected_fixture = os.path.join('fixtures', 'stout_menu', 'hollywood_2014-08-25.json')
         with file(expected_fixture) as f:
             expected = json.load(f)
-        self.assertEqual(expected.get('beverages'), flatten_beverages(actual))
+        self.assertEqual(len(expected), len(actual),
+                         'Beverage length does not match. expected={}, actual={}'.format(len(expected),
+                                                                                         len(actual)))
+        for i in range(0, len(expected)):
+            actual_flat = actual[i].flatten()
+            # Ignore timestamps
+            del expected[i]['created']
+            del actual_flat['created']
+            self.assertEqual(expected[i], actual_flat)
 
 
 class TestBeerParser(unittest.TestCase):
@@ -35,7 +42,7 @@ class TestBeerParser(unittest.TestCase):
         expected.scraped_value = string
         expected.name = 'Saison Dupont Cuvee Dry Hop'
         expected.brewery = 'Dupont'
-        expected.location = 'Belg'
+        expected.brewery_location = 'Belg'
         expected.style = 'Saison'
         expected.volume = 22.0
         expected.volume_units = 'oz'
@@ -43,13 +50,14 @@ class TestBeerParser(unittest.TestCase):
         expected.price = 10.0
         expected.type = 'Beer'
         expected.availability = 'Bottle'
-        self.assertEqual(expected.__dict__, actual.__dict__)
+        expected.created = actual.created
+        self.assertEqual(expected.flatten(), actual.flatten())
 
     def test_location_style_parsed_with_extras(self):
         """ Test that location and style are parsed correctly even if there's trailing content """
         parser = BeerParser()
         actual = parser.parse('Old Speckled Hen - Green King / UK / Cream Ale / Nitro / 5.2%')
-        self.assertEqual('UK', actual.location)
+        self.assertEqual('UK', actual.brewery_location)
         self.assertEqual('Cream Ale', actual.style)
 
     def test_weihenstephaner_exception(self):
@@ -58,7 +66,7 @@ class TestBeerParser(unittest.TestCase):
         actual = parser.parse('Weihenstephaner Original - Germ / Helles Lager / 5.1%')
         self.assertEqual('Weihenstephaner Original', actual.name)
         self.assertEqual('Weihenstephan', actual.brewery)
-        self.assertEqual('Germ', actual.location)
+        self.assertEqual('Germ', actual.brewery_location)
         self.assertEqual('Helles Lager', actual.style)
         self.assertEqual(5.1, actual.abv)
 
