@@ -4,8 +4,8 @@ import sys
 import stout
 import ball_and_chain
 from datetime import datetime
-from cache import cache_menu_scrape
-from scraper.model import MenuScrape
+from web.models import MenuScrape
+from web import db
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.INFO)
@@ -22,13 +22,16 @@ def scrape_location(location, scraper):
     :return:
     :rtype:
     """
-    _log('Scraping {} {} - {}'.format(location.chain, location.name, location.url), logging.INFO)
-    menu_scrape = MenuScrape(location, location.url, datetime.now())
+    _log('Scraping {} {} - {}'.format(location.chain.name, location.name, location.url), logging.INFO)
+    menu_scrape = MenuScrape(location=location, url=location.url, created=datetime.now())
     menu_html = urllib2.urlopen(location.url).read()
     if menu_html:
         _log('Read {0} bytes'.format(len(menu_html)), logging.INFO)
         menu_scrape.beverages = scraper.scrape(menu_html)
-        cache_menu_scrape(menu_scrape)
+        db.session.add(menu_scrape)
+        for beverage in menu_scrape.beverages:
+            db.session.add(beverage)
+        db.session.commit()
     else:
         _log('Unable to retrieve menu from {0}'.format(location.url), logging.ERROR)
 

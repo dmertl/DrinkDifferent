@@ -25,6 +25,7 @@ def diff_beverages(old_beverages, new_beverages):
     :return: List of added, removed Beverages
     :rtype: Beverage[], Beverage[]
     """
+    #TODO: manual comparsions, intersection won't work any more
     unchanged = set(old_beverages).intersection(new_beverages)
     removed = set(old_beverages).symmetric_difference(unchanged)
     added = set(new_beverages).symmetric_difference(unchanged)
