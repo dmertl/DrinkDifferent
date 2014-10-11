@@ -17,7 +17,8 @@ class MenuScrape(db.Model):
 
     def __init__(self, location=None, beverages=None, created=None):
         self.location = location
-        self.beverages = beverages
+        if beverages:
+            self.beverages = beverages
         self.created = created or datetime.now()
 
     def __repr__(self):
