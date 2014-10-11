@@ -4,7 +4,7 @@ import sys
 import stout
 import ball_and_chain
 from datetime import datetime
-from web.models import MenuScrape
+from web.models import MenuScrape, Location
 from web import db
 
 root_log = logging.getLogger()
@@ -28,9 +28,12 @@ def scrape_location(location, scraper):
     if menu_html:
         _log('Read {0} bytes'.format(len(menu_html)), logging.INFO)
         menu_scrape.beverages = scraper.scrape(menu_html)
+        # Flag all existing beverages as inactive
+        db.engine.execute('UPDATE beverage SET is_active = 0 WHERE location_id = :location_id', location_id=location.id)
         db.session.add(menu_scrape)
         for beverage in menu_scrape.beverages:
             beverage.menu_scrape = menu_scrape
+            beverage.location = location
             db.session.add(beverage)
         db.session.commit()
     else:
