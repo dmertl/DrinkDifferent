@@ -34,6 +34,7 @@ class Beverage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
     brewery = db.Column(db.String(128))
+    brewery_location = db.Column(db.String(128))
     type = db.Column(db.String(32))
     style = db.Column(db.String(128))
     abv = db.Column(db.Numeric(5, 2))
@@ -53,11 +54,12 @@ class Beverage(db.Model):
 
     menu_scrape_id = db.Column(db.Integer, db.ForeignKey('menu_scrape.id'))
 
-    def __init__(self, name=None, brewery=None, type='Beer', style=None, abv=None, year=None, description=None,
-                 availability=None, price=None, volume=None, volume_units=None, untappd_id=None,
+    def __init__(self, name=None, brewery=None, brewery_location=None, type='Beer', style=None, abv=None, year=None,
+                 description=None, availability=None, price=None, volume=None, volume_units=None, untappd_id=None,
                  untappd_brewery_id=None, scraped_value=None, created=None, is_active=True):
         self.name = name
         self.brewery = brewery
+        self.brewery_location = brewery_location
         self.type = type
         self.style = style
         self.abv = abv
@@ -77,10 +79,25 @@ class Beverage(db.Model):
         return '<Beverage {}>'.format(self.name)
 
     def flatten(self):
-        blacklist = ['created', 'location_id', 'location', 'menu_scrape', 'menu_scrape_id']
-        d = dict((k, v) for k, v in self.__dict__.iteritems() if v and not k in blacklist)
-        d['created'] = self.created.isoformat()
-        return d
+        return {
+            'id': self.id,
+            'name': self.name,
+            'brewery': self.brewery,
+            'brewery_location': self.brewery_location,
+            'type': self.type,
+            'style': self.style,
+            'abv': self.abv,
+            'description': self.description,
+            'availability': self.availability,
+            'price': self.price,
+            'volume': self.volume,
+            'volume_units': self.volume_units,
+            'untappd_id': self.untappd_id,
+            'untappd_brewery_id': self.untappd_brewery_id,
+            'scraped_value': self.scraped_value,
+            'created': self.created.isoformat(),
+            'is_active': self.is_active,
+        }
 
 
 class Location(db.Model):

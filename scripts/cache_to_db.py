@@ -97,6 +97,8 @@ def create_beverage(json_beverage):
                   'volume', 'volume_units', 'scraped_value']:
         if field in json_beverage:
             beverage.__setattr__(field, json_beverage.get(field))
+    if 'location' in json_beverage:
+        beverage.brewery_location = json_beverage['location']
     return beverage
 
 
