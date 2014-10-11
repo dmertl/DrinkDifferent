@@ -25,6 +25,13 @@ class MenuScrape(db.Model):
     def __repr__(self):
         return '<MenuScrape {}-{}>'.format(self.location_id, self.created)
 
+    def flatten(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'created': self.created.isoformat()
+        }
+
 
 class Beverage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -70,6 +77,12 @@ class Beverage(db.Model):
     def __repr__(self):
         return '<Beverage {}>'.format(self.name)
 
+    def flatten(self):
+        blacklist = ['created', 'location_id', 'location', 'menu_scrapes']
+        d = dict((k, v) for k, v in self.__dict__.iteritems() if v and not k in blacklist)
+        d['created'] = self.created.isoformat()
+        return d
+
 
 class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -94,6 +107,15 @@ class Location(db.Model):
     def __repr__(self):
         return '<Location {}>'.format(self.name)
 
+    def flatten(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'url': self.url,
+            'untappd_id': self.untappd_id,
+            'created': self.created.isoformat()
+        }
+
 
 class Chain(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -108,3 +130,10 @@ class Chain(db.Model):
 
     def __repr__(self):
         return '<Chain {}>'.format(self.name)
+
+    def flatten(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created': self.created.isoformat()
+        }
