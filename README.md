@@ -6,7 +6,8 @@ Find new beers to drink.
 TODO
 ----
 
-- Move everything to a database (sqlite)
+- Update scraper to use DB
+- Update web to use DB
 - Menu index page
 - Update menu view page to handle new menu format
 - Cleanup stout
