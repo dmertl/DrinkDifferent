@@ -69,6 +69,7 @@ def create_menu_scrape(json_data, filename):
             for location in locations:
                 if location.name == json_location.get('name') and location.chain.name == json_location.get('chain'):
                     menu_scrape.location = location
+                    menu_scrape.url = location.url
                     break
             if not menu_scrape.location:
                 root_log.warn('Unable to find matching location in database. name={}, chain={}, filename={}'
@@ -88,7 +89,7 @@ def create_beverage(json_beverage):
     :return:
     :rtype: Beverage
     """
-    beverage = Beverage()
+    beverage = Beverage(is_active=False)
     for field in ['name', 'brewery', 'type', 'style', 'abv', 'year', 'description', 'availability', 'price',
                   'volume', 'volume_units', 'scraped_value']:
         if field in json_beverage:
