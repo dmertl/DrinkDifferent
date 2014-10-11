@@ -1,16 +1,4 @@
-import argparse
-import os
-import json
-import logging
-import urllib2
-import sys
-
-root_log = logging.getLogger()
-root_log.setLevel(logging.WARN)
-
-
-class DiffException(Exception):
-    pass
+from models import Beverage
 
 
 def diff_beverages(old_beverages, new_beverages):
@@ -24,54 +12,24 @@ def diff_beverages(old_beverages, new_beverages):
     :return: List of added, removed Beverages
     :rtype: Beverage[], Beverage[]
     """
-    #TODO: manual comparsions, intersection won't work any more
-    unchanged = set(old_beverages).intersection(new_beverages)
-    removed = set(old_beverages).symmetric_difference(unchanged)
-    added = set(new_beverages).symmetric_difference(unchanged)
+    added = []
+    removed = []
+    for old_beverage in old_beverages:
+        found = False
+        for new_beverage in new_beverages:
+            if new_beverage.name == old_beverage.name and new_beverage.brewery == old_beverage.brewery:
+                found = True
+                break
+        if not found:
+            # Old beverage was removed
+            removed.append(old_beverage)
+    for new_beverage in new_beverages:
+        found = False
+        for old_beverage in old_beverages:
+            if old_beverage.name == new_beverage.name and old_beverage.brewery == new_beverage.brewery:
+                found = True
+                break
+        if not found:
+            # New beverage was added
+            added.append(new_beverage)
     return added, removed
-
-
-def _log(message, level=logging.INFO):
-    root_log.log(level, message)
-
-
-if __name__ == '__main__':
-    # Setup logging
-    sh = logging.StreamHandler(sys.stdout)
-    sh.setLevel(logging.INFO)
-    sh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-    root_log.addHandler(sh)
-
-    # Command line arguments
-    parser = argparse.ArgumentParser(description='Find beverages that were added or removed between menu scrapings.')
-    parser.add_argument('old', type=str, help='path to old menu scraping file')
-    parser.add_argument('new', type=str, help='path to new menu scraping file')
-    parser.add_argument('--pretty', action='store_true', help='pretty print JSON output')
-    args = parser.parse_args()
-
-    # Load menus
-    old = expand_menu_scrape(
-        json.loads(
-            urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath(args.old)))).read()
-        )
-    )
-    new = expand_menu_scrape(
-        json.loads(
-            urllib2.urlopen('file:{0}'.format(urllib2.quote(os.path.abspath(args.new)))).read()
-        )
-    )
-
-    # Find differences in beverages
-    added, removed = diff_beverages(old.beverages, new.beverages)
-    flat = {
-        'old_date': old.date.isoformat(),
-        'new_date': new.date.isoformat(),
-        'added': flatten_beverages(added),
-        'removed': flatten_beverages(removed)
-    }
-
-    # Output diff as JSON
-    if args.pretty:
-        print json.dumps(flat, indent=2)
-    else:
-        print json.dumps(flat)
