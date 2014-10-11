@@ -255,7 +255,7 @@ if __name__ == '__main__':
     # Command line arguments
     parser = argparse.ArgumentParser(description='Upgrade cache files from v1 to v2.')
 
-    root_dir = cache_root = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'menu_cache')
+    root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'scraper', 'menu_cache')
     root_log.debug('Upgrading root dir {}'.format(root_dir))
     for year in os.listdir(root_dir):
         year_dir = os.path.join(root_dir, year)
