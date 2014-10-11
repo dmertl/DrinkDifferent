@@ -7,17 +7,13 @@ Setup
 -----
 
 Create database with model schema.
-    scripts/create_schema.py
+    python scripts/create_schema.py
 Populate database with scrapable locations.
-    scripts/db_init_locations.py
+    python scripts/db_init_locations.py
 
 TODO
 ----
 
-- Update scraper to use DB
-- Update web to use DB
-- Menu index page
-- Update menu view page to handle new menu format
 - Cleanup stout
 - Config
 
@@ -26,17 +22,15 @@ Scrapers
 
 - Gather beverage data from various bar websites.
 - Standardized scraping process.
-- Separate scraper per bar.
+- Separate scraper class per chain.
 - Returns a list of standardized Beverage objects.
-- Beverage objects can be easily converted to JSON for storage or parsing.
+- Beverages are saved to database.
+- Scraping brewery and name are the important parts, every else isn't important
+- All scrapes should be executable scripts and python modules
+ - Executing from command line should allow for scraping file or url and output JSON
 
 ### Ideas
 
-- Ignore wine
-- Prioritize scraping name + brewery, everything else is irrelevant
-- All scrapes should be executable scripts and python modules
-- Executing from command line should allow for scraping file or url and output JSON
-- Would be nice if scrapers simply took HTML. So far both stout and ball and chain don't need any special handling.
 - Use checkin data from untappd to get beer list? Have to deal with stale data, how far back do we go for "current" beer?
 
 Menu Diff

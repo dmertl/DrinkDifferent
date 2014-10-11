@@ -9,7 +9,6 @@
 
 <nav>
     <ul>
-        <li><a href="#">Latest menu scrape.</a></li>
         <li><a href="{{ location.url }}">Website.</a></li>
     </ul>
 </nav>
@@ -19,7 +18,7 @@
     {% for beverage in location.beverages %}
         {% if beverage.is_active %}
             <li>
-                <a href="#">{{ beverage.brewery }} - {{ beverage.name }}</a>
+                {{ beverage.brewery }} - {{ beverage.name }}
             </li>
         {% endif %}
     {% endfor %}
