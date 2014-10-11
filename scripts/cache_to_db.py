@@ -1,5 +1,5 @@
 """
-Moves old menu cache files to sqlite database.
+Moves old v2 menu cache files to sqlite database.
 
 Each cache file becomes a MenuScrape. Each beverage becomes a Beverage.
 """
@@ -10,8 +10,6 @@ import json
 import logging
 import sys
 import dateutil.parser
-import scraper.cache
-import scraper.stout
 from web.models import MenuScrape, Beverage, Location
 from web import db
 
@@ -71,6 +69,7 @@ def create_menu_scrape(json_data, filename):
             for location in locations:
                 if location.name == json_location.get('name') and location.chain.name == json_location.get('chain'):
                     menu_scrape.location = location
+                    menu_scrape.url = location.url
                     break
             if not menu_scrape.location:
                 root_log.warn('Unable to find matching location in database. name={}, chain={}, filename={}'
@@ -87,16 +86,16 @@ def create_beverage(json_beverage):
 
     :param json_beverage:
     :type json_beverage: dict
-    :param filename:
-    :type filename: str
     :return:
     :rtype: Beverage
     """
-    beverage = Beverage()
+    beverage = Beverage(is_active=False)
     for field in ['name', 'brewery', 'type', 'style', 'abv', 'year', 'description', 'availability', 'price',
                   'volume', 'volume_units', 'scraped_value']:
         if field in json_beverage:
             beverage.__setattr__(field, json_beverage.get(field))
+    if 'location' in json_beverage:
+        beverage.brewery_location = json_beverage['location']
     return beverage
 
 
@@ -110,7 +109,7 @@ if __name__ == '__main__':
     # Command line arguments
     parser = argparse.ArgumentParser(description='Move cache files to database.')
 
-    root_dir = scraper.cache.cache_root
+    root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'scraper', 'menu_cache')
     root_log.debug('Upgrading root dir {}'.format(root_dir))
     for year in os.listdir(root_dir):
         year_dir = os.path.join(root_dir, year)
@@ -130,4 +129,4 @@ if __name__ == '__main__':
                 with file(file_path) as f:
                     json_data = json.load(f)
                 menu_scrape = to_database(json_data, filename)
-                root_log.info('Added cache file {} to the database. MenuScrape.id='.format(file_path, menu_scrape.id))
+                root_log.info('Added cache file {} to the database.'.format(file_path))

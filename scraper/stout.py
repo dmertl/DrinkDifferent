@@ -8,18 +8,15 @@ from abc import abstractmethod
 # TODO: Migrate to beautiful soup
 from lxml.html import fromstring
 from unidecode import unidecode
-from scraper.model import Location, Beverage
-from scraper.util import url_from_arg, flatten_beverages
+from web.models import Location, Beverage, Chain
+from scraper.util import url_from_arg
 import base
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.WARN)
 
-locations = [
-    Location('Hollywood', 'http://www.stoutburgersandbeers.com/hollywood-beer-menu/', 'Stout'),
-    Location('Studio City', 'http://www.stoutburgersandbeers.com/studio-city-beer-menu/', 'Stout'),
-    Location('Santa Monica', 'http://www.stoutburgersandbeers.com/santa-monica-beer-menu/', 'Stout'),
-]
+chain = Chain.query.filter_by(name='Stout').first()
+locations = Location.query.filter_by(chain=chain)
 
 # TODO: Move old code into Scraper
 class Scraper(base.Scraper):
@@ -117,7 +114,8 @@ def _parse_section(header_element, section_element, section_count):
             for beverage_element in beverage_elements:
                 beverage_count += 1
                 try:
-                    beverage = _parse_beverage(beverage_element, section['type'] == 'wine', beverage_count, section_count)
+                    beverage = _parse_beverage(beverage_element, section['type'] == 'wine', beverage_count,
+                                               section_count)
                     _log('Parsed beverage {0} "{1}".'.format(beverage_count, beverage.name))
                     # _log('Parsed beverage {0} "{1}".'.format(beverage_count, beverage['name']))
                     section['beverages'].append(beverage)
@@ -180,9 +178,7 @@ class BeerParser(object):
         :return:
         :rtype: Beverage
         """
-        beverage = Beverage()
-        beverage.type = 'Beer'
-        beverage.scraped_value = value
+        beverage = Beverage(type='Beer', is_active=True, scraped_value=value)
         value = self.prep(value)
         for extractor in self.extractors:
             try:
@@ -224,8 +220,8 @@ class BeerParser(object):
         if type(value) is unicode:
             value = unidecode(value)
         # Handle some troublesome strings
-        return value.replace('w/', 'with ')\
-            .replace('IPAw / ', 'IPA with ')\
+        return value.replace('w/', 'with ') \
+            .replace('IPAw / ', 'IPA with ') \
             .replace('Weihenstephaner Original - Germ', 'Weihenstephaner Original - Weihenstephan / Germ')
 
 
@@ -332,7 +328,7 @@ class LocationStyleExtractor(Extractor):
         if search and len(search.groups()) == 3:
             return {
                 '__value': value.replace(search.group(1), ''),
-                'location': search.group(2).strip(),
+                'brewery_location': search.group(2).strip(),
                 'style': search.group(3).strip()
             }
         raise ExtractionException('Unable to extract location or style. value={}'.format(value))
@@ -350,7 +346,7 @@ if __name__ == '__main__':
     root_log.addHandler(sh)
 
     # Command line arguments
-    parser = argparse.ArgumentParser(description='Parse http://www.stoutburgersandbeers.com/ beer menu into JSON.')
+    parser = argparse.ArgumentParser(description='Scrape http://www.stoutburgersandbeers.com/ beer menu.')
     parser.add_argument('filename', type=str, help='file path or URL to beverage menu')
     parser.add_argument('--pretty', action='store_true', help='pretty print JSON output')
     args = parser.parse_args()
@@ -359,7 +355,7 @@ if __name__ == '__main__':
     url = url_from_arg(args.filename, locations)
     contents = urllib2.urlopen(url).read()
     beverages = parse_menu(contents)
-    beverages_flat = flatten_beverages(beverages)
+    beverages_flat = [x.flatten() for x in beverages]
 
     # Output beverage data as JSON
     if args.pretty:

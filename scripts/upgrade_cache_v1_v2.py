@@ -1,5 +1,6 @@
 """
-Upgrades v1 cache files to v2.
+Upgrades v1 cache files to v2. v1 is the original cache file format, v2 was implemented on 10/5. Menu cache is now
+entirely gone, everything is in the database.
 
 File naming change:
 - Remove "menu_"
@@ -22,14 +23,142 @@ import urllib2
 import sys
 import re
 import dateutil.parser
-from scraper.model import Beverage, Location, MenuScrape
-import scraper.cache
-from scraper.util import flatten_menu_scrape
-import scraper.stout
+from datetime import datetime
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.INFO)
 
+# Copy of old model.py
+
+data_version = '2.0.0'
+
+
+class Beverage(object):
+    def __init__(self, name=None):
+        # Beverage name
+        self.name = name
+        # Brewery/Winery name
+        self.brewery = None
+        # Beer or Wine
+        self.type = None
+        # Beer style, IPA, Lager, etc.
+        self.style = None
+        # Brewery location
+        self.location = None
+        # ABV
+        self.abv = None
+        # Year
+        self.year = None
+        # Description
+        self.description = None
+        # On Tap or Bottle
+        self.availability = None
+        # Price
+        self.price = None
+        # Bottle volume dimension
+        self.volume = None
+        # Bottle volume units
+        self.volume_units = None
+        # Untappd beer ID
+        self.untappd_id = None
+        # Untappd brewery ID
+        self.untappd_brewery_id = None
+        # Beverage info as scraped (prior to parsing)
+        self.scraped_value = None
+
+    def __eq__(self, other):
+        if self.untappd_id and other.untappd_id:
+            return self.untappd_id == other.untappd_id
+        else:
+            return self.name == other.name
+
+    def __hash__(self):
+        return hash(str(self.untappd_id) + str(self.name))
+
+
+class Location(object):
+    def __init__(self, name=None, url=None, chain=None):
+        # Location name
+        self.name = name
+        # Beverage menu URL
+        self.url = url
+        # Chain name
+        self.chain = chain
+
+
+class MenuScrape(object):
+    def __init__(self, location=None, url=None, date=None, beverages=None, version=data_version):
+        # Location scraped
+        self.location = location
+        # URL scraped
+        self.url = url
+        # Date of scraping
+        self.date = date or datetime.now
+        # Beverages found
+        self.beverages = beverages or []
+        # Data format version number
+        self.version = version
+
+
+# End copy of old model.py
+
+# Copy of stout locations
+stout_locations = [
+    Location('Hollywood', 'http://www.stoutburgersandbeers.com/hollywood-beer-menu/', 'Stout'),
+    Location('Studio City', 'http://www.stoutburgersandbeers.com/studio-city-beer-menu/', 'Stout'),
+    Location('Santa Monica', 'http://www.stoutburgersandbeers.com/santa-monica-beer-menu/', 'Stout'),
+]
+
+# Copy of old util
+
+
+def flatten_menu_scrape(menu_scrape):
+    """
+    Convert a MenuScrape into a flat format that can easily be dumped to JSON.
+
+    :param menu_scrape: MenuScrape
+    :type menu_scrape: MenuScrape
+    :return:
+    :rtype: dict
+    """
+    return {
+        'location': flatten_location(menu_scrape.location),
+        'url': menu_scrape.url,
+        'date': menu_scrape.date.isoformat() if menu_scrape.date else None,
+        'beverages': flatten_beverages(menu_scrape.beverages),
+        'version': menu_scrape.version
+    }
+
+
+def flatten_location(location):
+    """
+    Flatten a Location into a dict that can be easily converted to JSON.
+
+    :param location: Location.
+    :type location: Location
+    :return: Dict.
+    :rtype: dict
+    """
+    return location.__dict__.copy()
+
+
+def flatten_beverages(beverages):
+    """
+    Convert a list of beverages into a flat format that can easily be dumped to JSON.
+
+    :param beverages:
+    :type beverages: Beverage[]
+    :return:
+    :rtype: dict[]
+    """
+    flat = []
+    for beverage in beverages:
+        flat.append(
+            dict((k, v) for k, v in beverage.__dict__.iteritems() if v)
+        )
+    return flat
+
+# End copy of old util
 
 def upgrade_filename(old_filename):
     """
@@ -104,7 +233,7 @@ def upgrade_content(content):
     # Find location by name
     location = Location('Unknown', '', 'Stout')
     if data.get('location'):
-        found = [x for x in scraper.stout.locations if x.name == data.get('location')]
+        found = [x for x in stout_locations if x.name == data.get('location')]
         if found:
             location = found[0]
     # Get date
@@ -126,7 +255,7 @@ if __name__ == '__main__':
     # Command line arguments
     parser = argparse.ArgumentParser(description='Upgrade cache files from v1 to v2.')
 
-    root_dir = scraper.cache.cache_root
+    root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'scraper', 'menu_cache')
     root_log.debug('Upgrading root dir {}'.format(root_dir))
     for year in os.listdir(root_dir):
         year_dir = os.path.join(root_dir, year)

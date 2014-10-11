@@ -1,21 +1,20 @@
 from web import db
 from datetime import datetime
 
-menu_scrape_beverage_table = db.Table('menu_scrape_beverage', db.metadata,
-                                      db.Column('menu_scrape_id', db.Integer, db.ForeignKey('menu_scrape.id')),
-                                      db.Column('beverage_id', db.Integer, db.ForeignKey('beverage.id')))
-
 
 class MenuScrape(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String(128))
     created = db.Column(db.DateTime)
 
-    beverages = db.relationship('Beverage', secondary=menu_scrape_beverage_table, backref='menu_scrapes')
+    beverages = db.relationship('Beverage', backref='menu_scrape')
 
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
 
-    def __init__(self, location=None, beverages=None, created=None):
-        self.location = location
+    def __init__(self, location=None, url=None, beverages=None, created=None):
+        if location:
+            self.location = location
+        self.url = url
         if beverages:
             self.beverages = beverages
         self.created = created or datetime.now()
@@ -23,11 +22,19 @@ class MenuScrape(db.Model):
     def __repr__(self):
         return '<MenuScrape {}-{}>'.format(self.location_id, self.created)
 
+    def flatten(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'created': self.created.isoformat()
+        }
+
 
 class Beverage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
     brewery = db.Column(db.String(128))
+    brewery_location = db.Column(db.String(128))
     type = db.Column(db.String(32))
     style = db.Column(db.String(128))
     abv = db.Column(db.Numeric(5, 2))
@@ -45,24 +52,52 @@ class Beverage(db.Model):
 
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
 
-    def __init__(self, name=None, brewery=None, type=None, created=None):
+    menu_scrape_id = db.Column(db.Integer, db.ForeignKey('menu_scrape.id'))
+
+    def __init__(self, name=None, brewery=None, brewery_location=None, type='Beer', style=None, abv=None, year=None,
+                 description=None, availability=None, price=None, volume=None, volume_units=None, untappd_id=None,
+                 untappd_brewery_id=None, scraped_value=None, created=None, is_active=True):
         self.name = name
         self.brewery = brewery
+        self.brewery_location = brewery_location
         self.type = type
+        self.style = style
+        self.abv = abv
+        self.year = year
+        self.description = description
+        self.availability = availability
+        self.price = price
+        self.volume = volume
+        self.volume_units = volume_units
+        self.untappd_id = untappd_id
+        self.untappd_brewery_id = untappd_brewery_id
+        self.scraped_value = scraped_value
         self.created = created or datetime.now()
+        self.is_active = is_active
 
     def __repr__(self):
         return '<Beverage {}>'.format(self.name)
 
-        # def __eq__(self, other):
-        # if self.untappd_id and other.untappd_id:
-        #             return self.untappd_id == other.untappd_id
-        #         else:
-        #             return self.name == other.name
-        #
-        #     def __hash__(self):
-        #         # TODO: This isn't really unique and may be problematic, but it makes intersection() work
-        #         return hash(str(self.untappd_id) + str(self.name))
+    def flatten(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'brewery': self.brewery,
+            'brewery_location': self.brewery_location,
+            'type': self.type,
+            'style': self.style,
+            'abv': self.abv,
+            'description': self.description,
+            'availability': self.availability,
+            'price': self.price,
+            'volume': self.volume,
+            'volume_units': self.volume_units,
+            'untappd_id': self.untappd_id,
+            'untappd_brewery_id': self.untappd_brewery_id,
+            'scraped_value': self.scraped_value,
+            'created': self.created.isoformat(),
+            'is_active': self.is_active,
+        }
 
 
 class Location(db.Model):
@@ -78,14 +113,24 @@ class Location(db.Model):
 
     menu_scrapes = db.relationship('MenuScrape', backref='location')
 
-    def __init__(self, name=None, url=None, chain=None, created=None):
+    def __init__(self, name=None, url=None, chain=None, untappd_id=None, created=None):
         self.name = name
         self.url = url
         self.chain = chain
+        self.untappd_id = untappd_id
         self.created = created or datetime.now()
 
     def __repr__(self):
         return '<Location {}>'.format(self.name)
+
+    def flatten(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'url': self.url,
+            'untappd_id': self.untappd_id,
+            'created': self.created.isoformat()
+        }
 
 
 class Chain(db.Model):
@@ -101,3 +146,10 @@ class Chain(db.Model):
 
     def __repr__(self):
         return '<Chain {}>'.format(self.name)
+
+    def flatten(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created': self.created.isoformat()
+        }

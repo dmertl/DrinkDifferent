@@ -5,6 +5,15 @@
     <title>Stout Beer Notifier</title>
 </head>
 <body>
-<a href="{{ url_for('menu_diff') }}">Beer Changes</a>
+<nav>
+    <ul>
+        <li>
+            <a href="{{ url_for('menu_diff') }}">Beer Changes</a>
+        </li>
+        <li>
+            <a href="{{ url_for('location_index') }}">Locations</a>
+        </li>
+    </ul>
+</nav>
 </body>
 </html>

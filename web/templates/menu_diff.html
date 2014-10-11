@@ -1,0 +1,53 @@
+{% set locations = ['Hollywood', 'Studio City', 'Santa Monica'] %}
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Stout beer notifier - Diff</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='FilteredSelect.js') }}"></script>
+</head>
+<body>
+<form method="get">
+    <label for="diff-chain">Chain</label>
+    <select name="chain_id" id="diff-chain">
+        {% for chain in chains %}
+            {% set selected = " selected" if chain.id == chain_id else "" %}
+            <option value="{{ chain.id }}"{{ selected }}>{{ chain.name }}</option>
+        {% endfor %}
+    </select>
+    <label for="diff-location">Location</label>
+    <select name="location_id" id="diff-location"></select>
+    <label for="diff-start">Start</label>
+    <input type="date" name="start" id="diff-start" value="{{ start.strftime('%Y-%m-%d') }}"/>
+    <label for="diff-end">End</label>
+    <input type="date" name="end" id="diff-end" value="{{ end.strftime('%Y-%m-%d') }}"/>
+    <button type="submit">Submit</button>
+</form>
+{% if diff %}
+    {% if diff['added'] or diff['removed'] %}
+        {% if diff['added'] %}
+            <h2>Added</h2>
+            <ul>
+                {% for beverage in diff['added'] %}
+                    <li>{{ beverage.brewery }} - {{ beverage.name }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if diff['removed'] %}
+            <h2>Removed</h2>
+            <ul>
+                {% for beverage in diff['removed'] %}
+                    <li>{{ beverage.brewery }} - {{ beverage.name }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% else %}
+        No beer changes
+    {% endif %}
+{% endif %}
+<script type="text/javascript">
+    FilteredSelect.init($('#diff-chain'), $('#diff-location'), {{ chain_opts|tojson|safe }}, {{ location_id|tojson|safe }});
+</script>
+</body>
+</html>
