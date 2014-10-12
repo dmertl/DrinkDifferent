@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<h1>Login</h1>
+{% if message %}
+    <p>{{ message }}</p>
+{% endif %}
+{% if current_user %}
+    <p>Currently logged in as <strong>{{ current_user }}</strong>. Enter a username to switch accounts.</p>
+{% else %}
+    <p>Not logged in. Enter a username to create a new account.</p>
+{% endif %}
+<form method="post">
+    <label for="username">Username:</label>
+    <input type="text" name="username" id="username"/>
+    <button type="submit">Submit</button>
+</form>
+<aside>
+    Note that there is no security at all around this authentication mechanism. A username simply lets you tie your
+    session to a user.
+</aside>
+</body>
+</html>

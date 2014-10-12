@@ -1,10 +1,10 @@
 from web import app, db
-from flask import render_template, request
+from flask import render_template, request, make_response
 from datetime import datetime, timedelta
 import dateutil.parser
 from sqlalchemy.sql import expression
 from menu_diff import diff_beverages
-from models import Location, MenuScrape, Chain
+from models import Location, MenuScrape, Chain, User
 
 
 @app.route('/')
@@ -92,3 +92,21 @@ def menu_diff():
     }.items())
 
     return render_template('menu_diff.html', **context)
+
+
+@app.route('/users/login', methods=['GET', 'POST'])
+def users_login():
+    current_user = request.cookies.get('username')
+    username = request.form.get('username')
+    if username:
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            user = User(username=username)
+            message = 'Logged in as new user "{}".'.format(username)
+        else:
+            message = 'Logged in as user "{}".'.format(username)
+        resp = make_response(render_template('users_login.html', current_user=user.username, message=message))
+        resp.set_cookie('username', username)
+    else:
+        resp = render_template('users_login.html', current_user=current_user)
+    return resp
