@@ -102,6 +102,8 @@ def users_login():
         user = User.query.filter_by(username=username).first()
         if not user:
             user = User(username=username)
+            db.session.add(user)
+            db.session.commit()
             message = 'Logged in as new user "{}".'.format(username)
         else:
             message = 'Logged in as user "{}".'.format(username)
