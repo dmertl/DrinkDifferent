@@ -8,4 +8,5 @@ setup(name='DrinkDifferent',
           'Flask',
           'beautifulsoup4',
           'Flask-SQLAlchemy',
+          'python-dateutil'
       ])

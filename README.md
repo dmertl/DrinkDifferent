@@ -7,9 +7,9 @@ Setup
 -----
 
 Create database with model schema.
-    python scripts/create_schema.py
+    python -m scripts.create_schema
 Populate database with scrapable locations.
-    python scripts/db_init_locations.py
+    python -m scripts.db_init_locations
 
 TODO
 ----
