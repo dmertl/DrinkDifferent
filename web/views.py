@@ -1,10 +1,11 @@
 from web import app, db
-from flask import render_template, request, make_response
+from flask import render_template, request, make_response, abort
 from datetime import datetime, timedelta
+import json
 import dateutil.parser
 from sqlalchemy.sql import expression
 from menu_diff import diff_beverages
-from models import Location, MenuScrape, Chain, User
+from models import Location, MenuScrape, Chain, User, BeverageCheckoff, Beverage
 
 
 @app.route('/')
@@ -49,8 +50,8 @@ def menu_diff():
     # Compute diff
     if location and start:
         context['diff'] = {'added': [], 'removed': []}
-        #TODO: match on day, not entire created timestamp
-        #TODO: always return a menu if possible (nearest matching date)
+        # TODO: match on day, not entire created timestamp
+        # TODO: always return a menu if possible (nearest matching date)
         # TODO: lean newer
         context['old_menu'] = MenuScrape.query.filter(
             expression.between(MenuScrape.created, start, start + timedelta(days=1)),
@@ -76,20 +77,20 @@ def menu_diff():
             else:
                 end = datetime.now()
         if not start:
-            #TODO: If we have an end date, set this to the nearest scrape of same location ~week before
+            # TODO: If we have an end date, set this to the nearest scrape of same location ~week before
             start = datetime.now() - timedelta(days=7)
 
     chains = Chain.query.all()
     chain_opts = dict((c.id, {l.id: l.name for l in c.locations}) for c in chains)
 
     context.update({
-        'chain_id': chain_id,
-        'location_id': location_id,
-        'start': start,
-        'end': end,
-        'chains': chains,
-        'chain_opts': chain_opts
-    }.items())
+                       'chain_id': chain_id,
+                       'location_id': location_id,
+                       'start': start,
+                       'end': end,
+                       'chains': chains,
+                       'chain_opts': chain_opts
+                   }.items())
 
     return render_template('menu_diff.html', **context)
 
@@ -112,3 +113,23 @@ def users_login():
     else:
         resp = render_template('users_login.html', current_user=current_user)
     return resp
+
+
+@app.route('/beverage_checkoffs/add', methods=['PUT'])
+def beverage_checkoffs_add():
+    name = request.args.get('name')
+    brewery = request.args.get('brewery')
+    beverage_id = request.args.get('beverage_id')
+    user_id = request.args.get('user_id')
+    if name and brewery and beverage_id and user_id:
+        checkoff = BeverageCheckoff.query.filter_by(name=name, brewery=brewery, beverage_id=beverage_id,
+                                                    user_id=user_id).first()
+        if not checkoff:
+            beverage = Beverage.query.get_or_404(beverage_id)
+            user = User.query.get_or_404(user_id)
+            checkoff = BeverageCheckoff(name=name, brewery=brewery, beverage_id=beverage.id, user=user)
+            db.session.add(checkoff)
+            db.session.commit()
+        return json.dumps(checkoff.flatten())
+    else:
+        abort(400)
