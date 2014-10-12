@@ -2,14 +2,122 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title></title>
+    <title>{{ location.chain.name }} - {{ location.name }}</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <style type="text/css">
+        {#        TODO: move to file #}
+        .dd-Beverage-drink {
+            display: inline-block;
+            border: solid 1px #666;
+            padding: 1px 4px;
+            border-radius: 4px;
+            font-size: 80%;
+            text-decoration: none;
+            color: #666;
+            background-color: #EEE;
+        }
+
+        .dd-Beverage-drink:hover,
+        .dd-Beverage--consumed .dd-Beverage-drink {
+            color: #FFF;
+            background-color: green;
+        }
+
+        .dd-Beverage--consumed {
+            color: #AAA;
+            text-decoration: line-through;
+        }
+    </style>
+    <script type="text/javascript">
+        //TODO: Move app to layout
+        window.app = {
+            'baseUrl': {{ request.script_root|tojson|safe }},
+            'currentUser': {{ current_user.flatten()|tojson|safe }}
+        };
+        //TODO: move to file
+        var DD = DD ? DD : {};
+        DD.BeverageLink = function ($) {
+            function init() {
+                $('.dd-Beverage-drink').each(function () {
+                    $(this).on('click', function (e) {
+                        e.preventDefault();
+                        toggleConsume($(this));
+                    });
+                });
+            }
+
+            function toggleConsume(drinkButton) {
+                //TODO: if user
+                if (window.app.currentUser) {
+                    var drink = drinkButton.closest('.dd-Beverage').first();
+                    if (drink.hasClass('dd-Beverage--consumed')) {
+                        unconsume(drink);
+                    } else {
+                        consume(drink);
+                    }
+                } else {
+                    alert('Must be logged in to drink beer.');
+                }
+            }
+
+            function consume(drink) {
+                console.log(drink.data());
+                drink.addClass('dd-Beverage--consumed');
+                $.ajax(window.app.baseUrl + '/beverage_checkoffs/add', {
+                    data: {
+                        'beverage_id': drink.data('beverage_id'),
+                        'name': drink.data('name'),
+                        'brewery': drink.data('brewery')
+                    },
+                    method: 'PUT'
+                }).success(function(data) {
+                    console.log(data);
+                    console.log(data['id']);
+                    console.log(data.id);
+                    drink.data('beverage_checkoff_id', data['id']);
+                    console.log(drink.data());
+                }).fail(function () {
+                    drink.removeClass('dd-Beverage--consumed');
+                });
+            }
+
+            function unconsume(drink) {
+                console.log(drink.data());
+                drink.removeClass('dd-Beverage--consumed');
+                $.ajax(window.app.baseUrl + '/beverage_checkoffs/delete/' + drink.data('beverage_checkoff_id'), {
+                    method: 'DELETE'
+                }).fail(function () {
+                    drink.removeClass('dd-Beverage--consumed');
+                    drink.removeData('beverage_checkoff_id');
+                    console.log(drink.data());
+                });
+            }
+
+            return {
+                'init': init
+            };
+        }(jQuery);
+    </script>
 </head>
 <body>
+{% macro beverage_link(beverage) -%}
+    <span class="dd-Beverage {{ 'dd-Beverage--consumed' if beverage.checkoff }}"
+          data-beverage_id="{{ beverage.id }}"
+          data-name="{{ beverage.name }}"
+          data-brewery="{{ beverage.brewery }}"
+          {% if beverage.checkoff %}
+            data-beverage_checkoff_id="{{ beverage.checkoff.id }}"
+          {% endif %}
+    >
+        {{ beverage.brewery }} - {{ beverage.name }}
+        <a href="#" class="dd-Beverage-drink">drink</a>
+    </span>
+{%- endmacro %}
 <h1>{{ location.chain.name }} - {{ location.name }}</h1>
 
 <nav>
     <ul>
-        <li><a href="{{ location.url }}">Website.</a></li>
+        <li><a href="{{ location.url }}">Website</a></li>
     </ul>
 </nav>
 
@@ -18,10 +126,15 @@
     {% for beverage in location.beverages %}
         {% if beverage.is_active %}
             <li>
-                {{ beverage.brewery }} - {{ beverage.name }}
+                {{ beverage_link(beverage) }}
             </li>
         {% endif %}
     {% endfor %}
 </ul>
+<script type="text/javascript">
+    $(document).ready(function () {
+        DD.BeverageLink.init();
+    });
+</script>
 </body>
 </html>

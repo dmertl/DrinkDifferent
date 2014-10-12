@@ -175,7 +175,8 @@ class User(db.Model):
     def flatten(self):
         return {
             'id': self.id,
-            'name': self.name,
+            'username': self.username,
+            'untappd_id': self.untappd_id,
             'created': self.created.isoformat()
         }
 
