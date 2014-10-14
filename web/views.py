@@ -1,11 +1,12 @@
 from web import app, db
-from flask import render_template, request, make_response, abort
+from flask import render_template, request, make_response, abort, redirect
 from datetime import datetime, timedelta
 import json
 import dateutil.parser
 from sqlalchemy.sql import expression
 from menu_diff import diff_beverages
 from models import Location, MenuScrape, Chain, User, BeverageCheckoff, Beverage
+from untappd import Untappd
 
 
 @app.route('/')
@@ -167,3 +168,24 @@ def beverage_checkoffs_delete(id):
             abort(401)
     else:
         abort(401)
+
+
+@app.route('/auth')
+def untappd_auth():
+    # TODO: Store access token in DB
+    untappd = Untappd(client_id='04513C89D24C72DD55C71441835D7BF4FF70077E',
+                      client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
+                      redirect_uri='http://dmertl.com/drink_different/auth')
+    # TEST
+    access_token = None
+    # TEST
+    if not access_token:
+        if 'code' in request.args:
+            access_token = untappd.oauth.get_token(request.args.get('code'))
+            untappd.set_access_token(access_token)
+        else:
+            auth_uri = untappd.oauth.auth_url()
+            return redirect(auth_uri)
+
+    info = untappd.user.info('dmertl')
+    return json.dumps(info)
