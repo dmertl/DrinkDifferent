@@ -5,7 +5,7 @@ import json
 import dateutil.parser
 from sqlalchemy.sql import expression
 from menu_diff import diff_beverages
-from models import Location, MenuScrape, Chain, User, BeverageCheckoff, Beverage
+from models import Location, MenuScrape, Chain, User, BeverageCheckoff, Beverage, DistinctBeer
 from untappd import Untappd
 
 
@@ -187,5 +187,9 @@ def untappd_auth():
             auth_uri = untappd.oauth.auth_url()
             return redirect(auth_uri)
 
-    info = untappd.user.info('dmertl')
-    return json.dumps(info)
+    beers = untappd.user.beers('dmertl')
+    # for beer in beers['beers']['items']:
+    #     distinct_beer = DistinctBeer(untappd_bid=beer['beer']['bid'], untappd_username='dmertl')
+    #     db.session.add(distinct_beer)
+    # db.session.commit()
+    return json.dumps(beers)

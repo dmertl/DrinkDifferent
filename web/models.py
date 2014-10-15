@@ -164,6 +164,8 @@ class User(db.Model):
 
     beverage_checkoffs = db.relationship('BeverageCheckoff', backref='user')
 
+    distinct_beers = db.relationship('DistinctBeer', backref='user')
+
     def __init__(self, username=None, untappd_id=None, created=None):
         self.username = username
         self.untappd_id = untappd_id
@@ -226,3 +228,17 @@ class BeverageCheckoff(db.Model):
         :rtype: bool
         """
         return self.name == beverage.name and self.brewery == beverage.brewery
+
+
+class DistinctBeer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    untappd_bid = db.Column(db.Integer)
+    untappd_username = db.Column(db.String(128))
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __init__(self, untappd_bid=None, untappd_username=None, user=None):
+        self.untappd_bid = untappd_bid
+        self.untappd_username = untappd_username
+        if user:
+            self.user = user
