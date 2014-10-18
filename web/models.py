@@ -90,7 +90,7 @@ class Beverage(db.Model):
 
     def __init__(self, name=None, brewery=None, type='Beer', style=None, abv=None, year=None, description=None,
                  availability=None, price=None, volume=None, volume_units=None, untappd_id=None, created=None,
-                 is_active=True, location=None, beverage_scrapes=None):
+                 is_active=True, location=None, beverage_scrapes=None, distinct_beers=None):
         self.name = name
         if brewery:
             self.brewery = brewery
@@ -108,8 +108,8 @@ class Beverage(db.Model):
         self.is_active = is_active
         if location:
             self.location = location
-        if beverage_scrapes:
-            self.beverage_scrapes = beverage_scrapes
+        self.beverage_scrapes = beverage_scrapes or []
+        self.distinct_beers = distinct_beers or []
 
     def __repr__(self):
         return '<Beverage {}>'.format(self.name)
@@ -223,8 +223,6 @@ class User(db.Model):
     untappd_id = db.Column(db.String(128))
     created = db.Column(db.DateTime)
 
-    beverage_checkoffs = db.relationship('BeverageCheckoff', backref='user')
-
     distinct_beers = db.relationship('DistinctBeer', backref='user')
 
     def __init__(self, username=None, untappd_id=None, created=None):
@@ -252,8 +250,10 @@ class DistinctBeer(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     beverage_id = db.Column(db.Integer, db.ForeignKey('beverage.id'))
 
-    def __init__(self, untappd_bid=None, untappd_username=None, user=None):
+    def __init__(self, untappd_bid=None, untappd_username=None, user=None, beverage=None):
         self.untappd_bid = untappd_bid
         self.untappd_username = untappd_username
         if user:
             self.user = user
+        if beverage:
+            self.beverage = beverage
