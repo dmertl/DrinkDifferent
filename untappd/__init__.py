@@ -224,7 +224,7 @@ class Untappd(object):
 
         def beers(self, USERNAME, params={}):
             """/v4/user/beers/USERNAME"""
-            return self.GET('wishlist/{USERNAME}'.format(USERNAME=USERNAME), params)
+            return self.GET('beers/{USERNAME}'.format(USERNAME=USERNAME), params)
 
     class Venue(_Endpoint):
         """Venue endpoint"""
