@@ -14,6 +14,8 @@ Populate database with scrapable locations.
 TODO
 ----
 
+- Separate Beverage and BeverageScrape
+ - Search for a Beverage matching scraped brewery and scraped name. If not found, create new Beverage.
 - Cleanup stout
 - Config
 
