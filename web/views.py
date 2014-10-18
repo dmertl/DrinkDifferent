@@ -26,12 +26,6 @@ def location(id):
     current_user = None
     if 'username' in request.cookies:
         current_user = User.query.filter_by(username=request.cookies.get('username')).first()
-        # Better system for getting checkoffs
-        for beverage in location.beverages:
-            for checkoff in current_user.beverage_checkoffs:
-                if checkoff.compare(beverage):
-                    beverage.checkoff = checkoff
-                    break
     return render_template('location_view.html', location=location, current_user=current_user)
 
 
@@ -125,50 +119,6 @@ def users_login():
     else:
         resp = render_template('users_login.html', current_user=current_user)
     return resp
-
-
-@app.route('/beverage_checkoffs/add', methods=['PUT'])
-def beverage_checkoffs_add():
-    name = request.form.get('name')
-    brewery = request.form.get('brewery')
-    beverage_id = request.form.get('beverage_id')
-    username = request.cookies.get('username')
-    if name and brewery and beverage_id and username:
-        # TODO: Handle this in JS
-        if brewery == 'None':
-            brewery = None
-        user = User.query.filter_by(username=username).first_or_404()
-        checkoff = BeverageCheckoff.query.filter_by(name=name, brewery=brewery, beverage_id=beverage_id,
-                                                    user_id=user.id).first()
-        if not checkoff:
-            beverage = Beverage.query.get_or_404(beverage_id)
-            checkoff = BeverageCheckoff(name=name, brewery=brewery, beverage_id=beverage.id, user=user)
-            db.session.add(checkoff)
-            db.session.commit()
-        resp = make_response(json.dumps(checkoff.flatten()))
-        resp.mimetype = 'application/json'
-        return resp
-    else:
-        abort(400)
-
-
-@app.route('/beverage_checkoffs/delete/<id>', methods=['DELETE'])
-def beverage_checkoffs_delete(id):
-    username = request.cookies.get('username')
-    if username:
-        user = User.query.filter_by(username=username).first_or_404()
-        checkoff = BeverageCheckoff.query.get_or_404(id)
-        if user == checkoff.user:
-            db.session.delete(checkoff)
-            db.session.commit()
-            resp = make_response(json.dumps(checkoff.flatten()))
-            resp.mimetype = 'application/json'
-            return resp
-        else:
-            abort(401)
-    else:
-        abort(401)
-
 
 @app.route('/auth')
 def untappd_auth():

@@ -243,53 +243,6 @@ class User(db.Model):
         }
 
 
-class BeverageCheckoff(db.Model):
-    """ Represents a beverage a user has had or no longer wants to see. """
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128))
-    brewery = db.Column(db.String(128))
-    untappd_id = db.Column(db.String(128))
-    created = db.Column(db.DateTime)
-
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-    # For reference purposes only, not a relation to Beverage
-    beverage_id = db.Column(db.Integer)
-
-    def __init__(self, name=None, brewery=None, untappd_id=None, created=None, user=None, beverage_id=None):
-        self.name = name
-        self.brewery = brewery
-        self.untappd_id = untappd_id
-        self.created = created or datetime.now()
-        if user:
-            self.user = user
-        self.beverage_id = beverage_id
-
-    def __repr__(self):
-        return '<BeverageCheckoff {} {}-{}>'.format(self.user_id, self.brewery, self.name)
-
-    def flatten(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'brewery': self.brewery,
-            'untappd_id': self.untappd_id,
-            'created': self.created.isoformat(),
-            'beverage_id': self.beverage_id
-        }
-
-    def compare(self, beverage):
-        """
-        Test if a Beverage is same as BeverageCheckoff.
-
-        :param beverage:
-        :type beverage: Beverage
-        :return:
-        :rtype: bool
-        """
-        return self.name == beverage.name and self.brewery == beverage.brewery
-
-
 class DistinctBeer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     untappd_bid = db.Column(db.Integer)
