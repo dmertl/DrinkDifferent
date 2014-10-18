@@ -41,6 +41,7 @@ def beverage_index():
                 beverage_id = beverage_ids[cnt]
                 beverage = Beverage.query.get(beverage_id)
                 if beverage:
+                    # TODO: look for existing distinct beers and link up
                     beverage.untappd_id = str(bid)
                     db.session.add(beverage)
             cnt += 1
@@ -146,7 +147,7 @@ def untappd_auth():
                       client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
                       redirect_uri='http://dmertl.com/drink_different/auth')
     # TEST
-    access_token = '59B8B1A2B81C1E18D967D7548EDC10E465051D6D'
+    access_token = None
     # TEST
     if not access_token:
         if 'code' in request.args:
@@ -157,13 +158,31 @@ def untappd_auth():
             return redirect(auth_uri)
 
     beers = untappd.user.beers('dmertl')
-    # user = User.query.filter_by(username='dmertl').first()
-    # for beer in beers['beers']['items']:
-    #     beverage = Beverage.query.filter_by(untappd_id=beer['beer']['bid']).first()
-    #     if not beverage:
-    #         beverage = None
-    #     distinct_beer = DistinctBeer(untappd_bid=beer['beer']['bid'], untappd_username='dmertl', user=user,
-    #                                  beverage=beverage)
-    #     db.session.add(distinct_beer)
-    # db.session.commit()
     return json.dumps(beers)
+
+
+@app.route('/sync_distinct')
+def sync_distinct():
+    untappd = Untappd(client_id='04513C89D24C72DD55C71441835D7BF4FF70077E',
+                      client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
+                      redirect_uri='http://dmertl.com/drink_different/auth')
+    access_token = None
+    untappd.set_access_token(access_token)
+    username = 'dmertl'
+
+    user = User.query.filter_by(username=username).first()
+    next_offset = 0
+    while True:
+        beers = untappd.user.beers(username, {'offset': next_offset, 'sort': 'date'})
+        if not beers or not beers['beers']['items']:
+            break
+        next_offset += beers['beers']['count']
+        for beer in beers['beers']['items']:
+            beverage = Beverage.query.filter_by(untappd_id=beer['beer']['bid']).first()
+            if not beverage:
+                beverage = None
+            distinct_beer = DistinctBeer(untappd_bid=beer['beer']['bid'], untappd_username='dmertl', user=user,
+                                         beverage=beverage)
+            db.session.add(distinct_beer)
+        db.session.commit()
+    return 'Done!'
