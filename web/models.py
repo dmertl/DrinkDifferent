@@ -86,6 +86,7 @@ class Beverage(db.Model):
     brewery_id = db.Column(db.Integer, db.ForeignKey('brewery.id'))
 
     beverage_scrapes = db.relationship('BeverageScrape', backref='beverage')
+    distinct_beers = db.relationship('DistinctBeer', backref='beverage')
 
     def __init__(self, name=None, brewery=None, type='Beer', style=None, abv=None, year=None, description=None,
                  availability=None, price=None, volume=None, volume_units=None, untappd_id=None, created=None,
@@ -249,6 +250,7 @@ class DistinctBeer(db.Model):
     untappd_username = db.Column(db.String(128))
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    beverage_id = db.Column(db.Integer, db.ForeignKey('beverage.id'))
 
     def __init__(self, untappd_bid=None, untappd_username=None, user=None):
         self.untappd_bid = untappd_bid
