@@ -29,6 +29,26 @@ def location(id):
     return render_template('location_view.html', location=location, current_user=current_user)
 
 
+@app.route('/beverages', methods=['GET', 'POST'])
+def beverage_index():
+    bids = request.form.getlist('bid[]')
+    beverage_ids = request.form.getlist('beverage_id[]')
+    if bids:
+        cnt = 0
+        for bid in bids:
+            if bid:
+                # Assumes sequential data
+                beverage_id = beverage_ids[cnt]
+                beverage = Beverage.query.get(beverage_id)
+                if beverage:
+                    beverage.untappd_id = str(bid)
+                    db.session.add(beverage)
+            cnt += 1
+        db.session.commit()
+    beverages = Beverage.query.filter_by(type='Beer')
+    return render_template('beverage_index.html', beverages=beverages)
+
+
 @app.route('/menus/')
 def menu_index():
     return render_template('menu_index.html', menus=MenuScrape.query.all())
@@ -37,7 +57,6 @@ def menu_index():
 @app.route('/menus/<id>')
 def menu(id):
     return render_template('menu_view.html', menu=MenuScrape.query.get_or_404(id))
-
 
 @app.route('/menus/diff')
 def menu_diff():
@@ -127,7 +146,7 @@ def untappd_auth():
                       client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
                       redirect_uri='http://dmertl.com/drink_different/auth')
     # TEST
-    access_token = None
+    access_token = '59B8B1A2B81C1E18D967D7548EDC10E465051D6D'
     # TEST
     if not access_token:
         if 'code' in request.args:

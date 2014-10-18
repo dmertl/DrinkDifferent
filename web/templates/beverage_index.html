@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<h2>Unmapped</h2>
+<form method="post">
+<button type="submit" name="Submit">Submit</button>
+<ul>
+{% for beverage in beverages %}
+    {% if not beverage.untappd_id %}
+        {% if beverage.brewery.name %}
+            {% set q = beverage.brewery.name + ' ' + beverage.name %}
+        {% else %}
+            {% set q = beverage.name %}
+        {% endif %}
+        <li>
+            <a href="https://untappd.com/search?q={{ q|urlencode }}" target="_blank">
+                {% if beverage.brewery.name %}
+                    {{ beverage.brewery.name }} -
+                {% endif %}
+                {{ beverage.name }}
+            </a>
+            <input type="hidden" name="beverage_id[]" value="{{ beverage.id }}" />
+            <input type="text" name="bid[]" placeholder="bid" />
+        </li>
+    {% endif %}
+{% endfor %}
+    </ul>
+<button type="submit" name="Submit">Submit</button>
+</form>
+<h2>Mapped</h2>
+<ul>
+{% for beverage in beverages %}
+    {% if beverage.untappd_id %}
+        <li>{{ beverage.brewery.name }} - {{ beverage.name }}</li>
+    {% endif %}
+{% endfor %}
+</ul>
+</body>
+</html>
