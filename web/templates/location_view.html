@@ -32,15 +32,18 @@
         //TODO: Move app to layout
         window.app = {
             'baseUrl': {{ request.script_root|tojson|safe }},
-            'currentUser': {{ current_user.flatten()|tojson|safe }}
+            {% if current_user %}
+                'currentUser': {{ current_user.flatten()|tojson|safe }}
+            {% else %}
+                'currentUser': false
+            {% endif %}
         };
     </script>
 </head>
 <body>
 {% macro beverage_link(beverage) -%}
     <span class="dd-Beverage" data-beverage_id="{{ beverage.id }}">
-        {{ beverage.brewery }} - {{ beverage.name }}
-        <a href="#" class="dd-Beverage-drink">drink</a>
+        {{ beverage.brewery.name }} - {{ beverage.name }}
     </span>
 {%- endmacro %}
 <h1>{{ location.chain.name }} - {{ location.name }}</h1>
@@ -51,14 +54,20 @@
     </ul>
 </nav>
 
-<h2>Current Beverages</h2>
+<h2>Unconsumed Beverages</h2>
 <ul>
-    {% for beverage in location.beverages %}
-        {% if beverage.is_active %}
-            <li>
-                {{ beverage_link(beverage) }}
-            </li>
-        {% endif %}
+    {% for beverage in unconsumed %}
+        <li>
+            {{ beverage_link(beverage) }}
+        </li>
+    {% endfor %}
+</ul>
+<h2>Consumed Beverages</h2>
+<ul>
+    {% for beverage in consumed %}
+        <li>
+            {{ beverage_link(beverage) }}
+        </li>
     {% endfor %}
 </ul>
 </body>

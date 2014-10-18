@@ -23,10 +23,25 @@ def location_index():
 def location(id):
     location = Location.query.get_or_404(id)
     # TODO: moved user to shared location
-    current_user = None
-    if 'username' in request.cookies:
-        current_user = User.query.filter_by(username=request.cookies.get('username')).first()
-    return render_template('location_view.html', location=location, current_user=current_user)
+    # TEST username
+    current_user = User.query.filter_by(username='dmertl').first()
+    # current_user = None
+    # if 'username' in request.cookies:
+    #     current_user = User.query.filter_by(username=request.cookies.get('username')).first()
+    #TODO: Join to find consumed/unconsumed
+    consumed = []
+    unconsumed = location.beverages[:]
+    for loc_bev in location.beverages:
+        if loc_bev.untappd_id:
+            for user_bev in current_user.distinct_beers:
+                if str(user_bev.untappd_bid) == str(loc_bev.untappd_id):
+                    consumed.append(loc_bev)
+                    for con_bev in unconsumed:
+                        if con_bev.untappd_id == loc_bev.untappd_id:
+                            del con_bev
+
+    return render_template('location_view.html', location=location, current_user=current_user, consumed=consumed,
+                           unconsumed=unconsumed)
 
 
 @app.route('/beverages', methods=['GET', 'POST'])

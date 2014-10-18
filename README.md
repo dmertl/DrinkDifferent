@@ -14,6 +14,8 @@ Populate database with scrapable locations.
 TODO
 ----
 
+- Better method of finding consumed/unconsumed (join)
+- Maybe change distinct to join beverages based on untappd_id
 - Run bev_scrape_split.py on production (backup db first)
 - Cleanup stout
 - Config
