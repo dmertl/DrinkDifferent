@@ -8,5 +8,6 @@ setup(name='DrinkDifferent',
           'Flask',
           'beautifulsoup4',
           'Flask-SQLAlchemy',
-          'python-dateutil'
+          'python-dateutil',
+          'requests', # Required until we separate untappd into its own project
       ])
