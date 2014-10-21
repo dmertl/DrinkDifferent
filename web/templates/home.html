@@ -5,6 +5,13 @@
     <title>Stout Beer Notifier</title>
 </head>
 <body>
+<p>
+    {% if user %}
+        Logged in as {{ user.username }}.
+    {% else %}
+        <a href="{{ url_for('untappd_auth') }}">Login</a>
+    {% endif %}
+</p>
 <nav>
     <ul>
         <li>
@@ -12,9 +19,6 @@
         </li>
         <li>
             <a href="{{ url_for('location_index') }}">Locations</a>
-        </li>
-        <li>
-            <a href="{{ url_for('untappd_auth') }}">Login</a>
         </li>
     </ul>
 </nav>
