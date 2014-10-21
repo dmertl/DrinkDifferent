@@ -217,17 +217,16 @@ class Chain(db.Model):
 
 
 class User(db.Model):
-    """ App user, someday link to untappd """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128))
-    untappd_id = db.Column(db.String(128))
+    access_token = db.Column(db.String(40))
     created = db.Column(db.DateTime)
 
     distinct_beers = db.relationship('DistinctBeer', backref='user')
 
-    def __init__(self, username=None, untappd_id=None, created=None):
+    def __init__(self, username=None, access_token=None, created=None):
         self.username = username
-        self.untappd_id = untappd_id
+        self.access_token = access_token
         self.created = created or datetime.now()
 
     def __repr__(self):
@@ -237,7 +236,6 @@ class User(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            'untappd_id': self.untappd_id,
             'created': self.created.isoformat()
         }
 

@@ -206,23 +206,23 @@ class Untappd(object):
         """User endpoint"""
         endpoint = 'user'
 
-        def info(self, USERNAME, params={}):
+        def info(self, USERNAME='', params={}):
             """/v4/user/info/USERNAME"""
             return self.GET('info/{USERNAME}'.format(USERNAME=USERNAME), params)
 
-        def badges(self, USERNAME, params={}):
+        def badges(self, USERNAME='', params={}):
             """/v4/user/badges/USERNAME"""
             return self.GET('badges/{USERNAME}'.format(USERNAME=USERNAME), params)
 
-        def friends(self, USERNAME, params={}):
+        def friends(self, USERNAME='', params={}):
             """/v4/user/friends/USERNAME"""
             return self.GET('friends/{USERNAME}'.format(USERNAME=USERNAME), params)
 
-        def wishlist(self, USERNAME, params={}):
+        def wishlist(self, USERNAME='', params={}):
             """/v4/user/wishlist/USERNAME"""
             return self.GET('wishlist/{USERNAME}'.format(USERNAME=USERNAME), params)
 
-        def beers(self, USERNAME, params={}):
+        def beers(self, USERNAME='', params={}):
             """/v4/user/beers/USERNAME"""
             return self.GET('beers/{USERNAME}'.format(USERNAME=USERNAME), params)
 

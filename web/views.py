@@ -1,5 +1,5 @@
 from web import app, db
-from flask import render_template, request, make_response, abort, redirect
+from flask import render_template, request, make_response, abort, redirect, session, g, url_for
 from datetime import datetime, timedelta
 import json
 import dateutil.parser
@@ -7,6 +7,13 @@ from sqlalchemy.sql import expression
 from menu_diff import diff_beverages
 from models import Location, MenuScrape, Chain, User, Beverage, DistinctBeer
 from untappd import Untappd
+
+
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user_id' in session:
+        g.user = User.query.get(session['user_id'])
 
 
 @app.route('/')
@@ -27,7 +34,7 @@ def location(id):
     current_user = User.query.filter_by(username='dmertl').first()
     # current_user = None
     # if 'username' in request.cookies:
-    #     current_user = User.query.filter_by(username=request.cookies.get('username')).first()
+    # current_user = User.query.filter_by(username=request.cookies.get('username')).first()
     #TODO: Join to find consumed/unconsumed
     consumed = []
     unconsumed = location.beverages[:]
@@ -75,6 +82,7 @@ def menu_index():
 @app.route('/menus/<id>')
 def menu(id):
     return render_template('menu_view.html', menu=MenuScrape.query.get_or_404(id))
+
 
 @app.route('/menus/diff')
 def menu_diff():
@@ -138,68 +146,49 @@ def menu_diff():
     return render_template('menu_diff.html', **context)
 
 
-@app.route('/users/login', methods=['GET', 'POST'])
-def users_login():
-    current_user = request.cookies.get('username')
-    username = request.form.get('username')
-    if username:
-        user = User.query.filter_by(username=username).first()
-        if not user:
-            user = User(username=username)
-            db.session.add(user)
-            db.session.commit()
-            message = 'Logged in as new user "{}".'.format(username)
-        else:
-            message = 'Logged in as user "{}".'.format(username)
-        resp = make_response(render_template('users_login.html', current_user=user.username, message=message))
-        resp.set_cookie('username', username)
-    else:
-        resp = render_template('users_login.html', current_user=current_user)
-    return resp
-
 @app.route('/auth')
 def untappd_auth():
-    # TODO: Store access token in DB
     untappd = Untappd(client_id='04513C89D24C72DD55C71441835D7BF4FF70077E',
                       client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
                       redirect_uri='http://dmertl.com/drink_different/auth')
-    # TEST
-    access_token = '9D797A7752F650BEA81500C8E13FA87955528579'
-    # TEST
-    if not access_token:
-        if 'code' in request.args:
-            access_token = untappd.oauth.get_token(request.args.get('code'))
-            untappd.set_access_token(access_token)
-        else:
-            auth_uri = untappd.oauth.auth_url()
-            return redirect(auth_uri)
 
-    beers = untappd.user.beers('dmertl')
-    return json.dumps(beers)
+    if 'code' in request.args:
+        access_token = untappd.oauth.get_token(request.args.get('code'))
+        untappd.set_access_token(access_token)
+        untappd_user = untappd.user.info()
+        user = User.query.filter_by(username=untappd_user['user']['user_name']).first()
+        if not user:
+            user = User(username=untappd_user['user']['user_name'], access_token=access_token)
+            db.session.add(user)
+            db.session.commit()
+        session['user_id'] = user.id
+        return redirect(url_for('home'))
+    else:
+        auth_uri = untappd.oauth.auth_url()
+        return redirect(auth_uri)
 
 
 @app.route('/sync_distinct')
 def sync_distinct():
-    untappd = Untappd(client_id='04513C89D24C72DD55C71441835D7BF4FF70077E',
-                      client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
-                      redirect_uri='http://dmertl.com/drink_different/auth')
-    access_token = '9D797A7752F650BEA81500C8E13FA87955528579'
-    untappd.set_access_token(access_token)
-    username = 'dmertl'
-
-    user = User.query.filter_by(username=username).first()
-    next_offset = 0
-    while True:
-        beers = untappd.user.beers(username, {'offset': next_offset, 'sort': 'date'})
-        if not beers or not beers['beers']['items']:
-            break
-        next_offset += beers['beers']['count']
-        for beer in beers['beers']['items']:
-            beverage = Beverage.query.filter_by(untappd_id=beer['beer']['bid']).first()
-            if not beverage:
-                beverage = None
-            distinct_beer = DistinctBeer(untappd_bid=beer['beer']['bid'], untappd_username='dmertl', user=user,
-                                         beverage=beverage)
-            db.session.add(distinct_beer)
-        db.session.commit()
-    return 'Done!'
+    if g.user:
+        untappd = Untappd(client_id='04513C89D24C72DD55C71441835D7BF4FF70077E',
+                          client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
+                          redirect_uri='http://dmertl.com/drink_different/auth')
+        untappd.set_access_token(g.user.access_token)
+        next_offset = 0
+        while True:
+            beers = untappd.user.beers(g.user.username, {'offset': next_offset, 'sort': 'date'})
+            if not beers or not beers['beers']['items']:
+                break
+            next_offset += beers['beers']['count']
+            for beer in beers['beers']['items']:
+                beverage = Beverage.query.filter_by(untappd_id=beer['beer']['bid']).first()
+                if not beverage:
+                    beverage = None
+                distinct_beer = DistinctBeer(untappd_bid=beer['beer']['bid'], untappd_username=g.user.username,
+                                             user=g.user, beverage=beverage)
+                db.session.add(distinct_beer)
+            db.session.commit()
+        return 'Done!'
+    else:
+        return abort(401)
