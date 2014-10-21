@@ -151,7 +151,6 @@ def untappd_auth():
     untappd = Untappd(client_id='04513C89D24C72DD55C71441835D7BF4FF70077E',
                       client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
                       redirect_uri='http://dmertl.com/drink_different/auth')
-
     if 'code' in request.args:
         access_token = untappd.oauth.get_token(request.args.get('code'))
         untappd.set_access_token(access_token)
