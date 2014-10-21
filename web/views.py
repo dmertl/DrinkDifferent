@@ -56,9 +56,11 @@ def beverage_index():
                 beverage_id = beverage_ids[cnt]
                 beverage = Beverage.query.get(beverage_id)
                 if beverage:
-                    # TODO: look for existing distinct beers and link up
                     beverage.untappd_id = str(bid)
                     db.session.add(beverage)
+                    distinct = DistinctBeer.query.filter_by(untappd_bid=bid).first()
+                    if distinct:
+                        distinct.beverage_id = beverage.id
             cnt += 1
         db.session.commit()
     beverages = Beverage.query.filter_by(type='Beer')
@@ -162,7 +164,7 @@ def untappd_auth():
                       client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
                       redirect_uri='http://dmertl.com/drink_different/auth')
     # TEST
-    access_token = None
+    access_token = '9D797A7752F650BEA81500C8E13FA87955528579'
     # TEST
     if not access_token:
         if 'code' in request.args:
@@ -181,7 +183,7 @@ def sync_distinct():
     untappd = Untappd(client_id='04513C89D24C72DD55C71441835D7BF4FF70077E',
                       client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
                       redirect_uri='http://dmertl.com/drink_different/auth')
-    access_token = None
+    access_token = '9D797A7752F650BEA81500C8E13FA87955528579'
     untappd.set_access_token(access_token)
     username = 'dmertl'
 
