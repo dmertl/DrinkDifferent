@@ -8,8 +8,9 @@ from abc import abstractmethod
 # TODO: Migrate to beautiful soup
 from lxml.html import fromstring
 from unidecode import unidecode
-from web.models import Location, Beverage, Chain
+from web.models import Location, Chain
 from scraper.util import url_from_arg
+from base import ScrapedBeverage
 import base
 
 root_log = logging.getLogger()
@@ -170,15 +171,15 @@ class BeerParser(object):
 
     def parse(self, value):
         """
-        Parse a beverage string into a Beverage.
+        Parse a beverage string into a ScrapedBeverage.
 
         TODO: Support conditional extractors. If extract X fails, run extractor Y.
         :param value:
         :type value: str|unicode
         :return:
-        :rtype: Beverage
+        :rtype: ScrapedBeverage
         """
-        beverage = Beverage(type='Beer', is_active=True, scraped_value=value)
+        beverage = ScrapedBeverage(type='Beer', scraped_value=value)
         value = self.prep(value)
         for extractor in self.extractors:
             try:

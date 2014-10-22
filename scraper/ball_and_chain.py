@@ -8,7 +8,8 @@ import re
 from bs4 import BeautifulSoup
 from scraper.util import url_from_arg
 from unidecode import unidecode
-from web.models import Chain, Beverage, Location
+from web.models import Chain, Location
+from base import ScrapedBeverage
 
 root_log = logging.getLogger()
 root_log.setLevel(logging.DEBUG)
@@ -28,7 +29,7 @@ class Scraper(base.Scraper):
         :param html:
         :type html:
         :return:
-        :rtype: Beverage[]
+        :rtype: ScrapedBeverage[]
         """
         beverages = []
         # Do a little cleanup to help BeautifulSoup parse correctly
@@ -49,7 +50,7 @@ class Scraper(base.Scraper):
                 # h2 is Brewery - Name
                 if beverage:
                     beverages.append(beverage)
-                beverage = Beverage(type='Beer', availability='On Tap', is_active=True)
+                beverage = ScrapedBeverage(type='Beer', availability='On Tap')
                 pieces = element.text.split('-')
                 if len(pieces) == 2:
                     brewery = pieces[0].strip()
@@ -65,7 +66,8 @@ class Scraper(base.Scraper):
                 beverage.brewery = brewery
             elif element.name == 'h3':
                 # h3 is Location
-                beverage.brewery_location = element.string.strip()
+                if beverage:
+                    beverage.brewery_location = element.string.strip()
         if beverage:
             beverages.append(beverage)
         return beverages
@@ -100,9 +102,9 @@ class Scraper(base.Scraper):
                         except ValueError:
                             root_log.warn('Unable to convert price into float. price={}'.format(bev[1]))
                             price = None
-                        beverage = Beverage(name=name, price=price, type=current_type, availability='Bottle',
-                                            is_active=True)
-                        beverages.append(beverage)
+                        beverages.append(
+                            ScrapedBeverage(name=name, price=price, type=current_type, availability='Bottle')
+                        )
                     else:
                         root_log.warn('Unable to parse name and cost from bottled beverage. string={0}'.format(bev))
 
