@@ -10,4 +10,5 @@ setup(name='DrinkDifferent',
           'Flask-SQLAlchemy',
           'python-dateutil',
           'requests', # Required until we separate untappd into its own project
+          'flask-debugtoolbar',
       ])
