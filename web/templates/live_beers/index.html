@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Live Beers</title>
+</head>
+<body>
+<h1>Live Beers</h1>
+<p>
+    View the beers available at your location according to Untappd.
+</p>
+<h2>Locations</h2>
+{# TODO: Pull location from GPS or something #}
+<ul>
+    <li>
+        <a href="{{ url_for('live_beers_view', id=1237421) }}">Ball & Chain</a>
+    </li>
+</ul>
+</body>
+</html>

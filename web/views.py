@@ -150,7 +150,7 @@ def menu_diff():
 def untappd_auth():
     untappd = Untappd(client_id='04513C89D24C72DD55C71441835D7BF4FF70077E',
                       client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
-                      redirect_uri='http://dmertl.com/drink_different/auth')
+                      redirect_uri='http://127.0.0.1:5000/auth')
     if 'code' in request.args:
         access_token = untappd.oauth.get_token(request.args.get('code'))
         untappd.set_access_token(access_token)
@@ -191,3 +191,27 @@ def sync_distinct():
         return 'Done!'
     else:
         return abort(401)
+
+@app.route('/live_beers')
+def live_beers_index():
+    return render_template('live_beers/index.html')
+
+@app.route('/live_beers/<id>')
+def live_beers_view(id):
+    if g.user:
+        untappd = Untappd(client_id='04513C89D24C72DD55C71441835D7BF4FF70077E',
+                          client_secret='02D05C33B6152E3BC9183ECB5BE58DF289D47457',
+                          redirect_uri='http://dmertl.com/drink_different/auth')
+        response = untappd.venue.checkins(id)
+        beers = []
+        for item in response['checkins']['items']:
+            # Ignore duplicate beers
+            if not [x for x in beers if x['beer']['bid'] == item['beer']['bid']]:
+                found = DistinctBeer.query.filter_by(untappd_bid=item['beer']['bid'], user=g.user).first()
+                beers.append({
+                    'beer': item['beer'],
+                    'consumed': bool(found)
+                })
+    else:
+        abort(401)
+    return render_template('live_beers/view.html', beers=beers)
