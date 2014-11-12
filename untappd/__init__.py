@@ -234,6 +234,10 @@ class Untappd(object):
             """/v4/venue/info/VENUE_ID"""
             return self.GET('info/{VENUE_ID}'.format(VENUE_ID=VENUE_ID), params)
 
+        def checkins(self, VENUE_ID, params={}):
+            """/v4/venue/checkins/VENUE_ID"""
+            return self.GET('checkins/{VENUE_ID}'.format(VENUE_ID=VENUE_ID), params)
+
     class Brewery(_Endpoint):
         """Brewery endpoint"""
         endpoint = 'brewery'
